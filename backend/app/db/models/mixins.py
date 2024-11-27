@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
 
-from sqlalchemy import text
+from sqlalchemy import text, BIGINT, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -15,10 +15,21 @@ class UUIDPrimaryKey:
     )
 
 
-class IntPrimaryKey:
-    """Целочисленный первичный ключ для моделей алхимии."""
+class BigIntPrimaryKey:
+    """Большой целочисленный первичный ключ для моделей алхимии."""
 
     id: Mapped[int] = mapped_column(
+        BIGINT,
+        primary_key=True,
+        comment="Идентификатор",
+    )
+
+
+class SmallIntPrimaryKey:
+    """Маленький целочисленный первичный ключ для моделей алхимии."""
+
+    id: Mapped[int] = mapped_column(
+        SMALLINT,
         primary_key=True,
         comment="Идентификатор",
     )
