@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:latest
+    env_file: config/.env
+    ports:
+      - "5432:5432"
+    volumes:
+        - pgdata:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/dev/api/Dockerfile
+    command: bash ./run_dev.sh
+    env_file: config/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./backend:/backend/"
+#      - "./certs:/certs"
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  pgdata:
