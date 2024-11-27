@@ -11,14 +11,14 @@ class Company(Base, UUIDPrimaryKey):
     __tablename__ = "company"
 
     name: Mapped[str] = mapped_column(comment="Наименование организации")
-    description: Mapped[str] = mapped_column(comment="Описание организации")
+    description: Mapped[str | None] = mapped_column(comment="Описание организации")
     subdomain: Mapped[str] = mapped_column(String(50), comment="Субдомен организации")
     timezone_id: Mapped[int] = mapped_column(
         SMALLINT,
         ForeignKey("timezones.id", ondelete="RESTRICT"),
         comment="Идентификатор таймзоны",
     )
-    logo: Mapped[str] = mapped_column(comment="Логотип организации")
+    logo: Mapped[str | None] = mapped_column(comment="Логотип организации")
 
     def __repr__(self):
         return self.name
