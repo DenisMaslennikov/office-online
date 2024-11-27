@@ -8,7 +8,7 @@ from app.db.models.base import Base
 class Company(Base, UUIDPrimaryKey):
     """Модель компании."""
 
-    __tablename__ = "company"
+    __tablename__ = "companies"
 
     name: Mapped[str] = mapped_column(comment="Наименование организации")
     description: Mapped[str | None] = mapped_column(comment="Описание организации")
