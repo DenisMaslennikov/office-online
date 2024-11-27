@@ -6,7 +6,7 @@ from app.db.models.base import Base
 
 
 class User(Base, UUIDPrimaryKey):
-    """Модель пользователя"""
+    """Модель пользователя."""
 
     __tablename__ = "users"
 
