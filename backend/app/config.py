@@ -10,9 +10,7 @@ from app.constants import BASE_DIR
 class ApiV1Endpoints(BaseModel):
     """Эндпоинты первой версии апи."""
 
-    users: str = "/users"
-    tasks: str = "/tasks"
-    classifiers: str = "/classifiers"
+    pass
 
 
 class ApiV1(BaseModel):
