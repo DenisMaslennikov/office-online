@@ -1,4 +1,4 @@
-from sqlalchemy import String, SMALLINT, ForeignKey
+from sqlalchemy import String, SMALLINT, ForeignKey, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.mixins import UUIDPrimaryKeyMixin
@@ -23,7 +23,7 @@ class User(Base, UUIDPrimaryKeyMixin):
         comment="Идентификатор таймзоны",
     )
     is_bot: Mapped[bool] = mapped_column(
-        comment="Является ли пользователь ботом", server_default="false", default=False
+        comment="Является ли пользователь ботом", server_default=text("false"), default=False
     )
     active: Mapped[bool] = mapped_column(comment="Активен ли аккаунт пользователя", default=True, server_default="true")
 
