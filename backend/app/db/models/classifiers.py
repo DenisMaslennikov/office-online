@@ -20,7 +20,8 @@ class Roles(Base, UUIDPrimaryKey):
     """Пополняемый классификатор ролей."""
 
     __tablename__ = "roles"
-    __table_args__ = (UniqueConstraint("company_id", "name"),)
+    __table_args__ = {"constraints": (UniqueConstraint("company_id", "name"),)}
+
     name: Mapped[str] = mapped_column(String(30), comment="Название роли")
     company_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("companies.id"), comment="Идентификатор компании управляющей ролью"
