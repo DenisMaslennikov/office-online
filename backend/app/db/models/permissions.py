@@ -36,3 +36,20 @@ class SubjectPermissionCompany(Base, BigIntPrimaryKey):
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
+
+
+class CompanyUserRole(Base, BigIntPrimaryKey):
+    """Роли пользователей в компании."""
+
+    __tablename__ = "company_users_roles"
+    __table_args__ = {
+        "constraints": (UniqueConstraint("company_id", "user_id", "role_id", name="uq_company_user_role"),)
+    }
+
+    company_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
+    )
+    role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли")
