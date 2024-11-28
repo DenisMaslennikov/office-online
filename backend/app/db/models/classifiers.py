@@ -26,3 +26,15 @@ class Roles(Base, UUIDPrimaryKey):
     company_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("companies.id"), comment="Идентификатор компании управляющей ролью"
     )
+
+
+class Permission(Base, SmallIntPrimaryKey):
+    """Классификатор возможных разрешений."""
+
+    __tablename__ = "permissions"
+
+    display_name: Mapped[str] = mapped_column(
+        String(100), unique=True, comment="Имя разрешения для отображения пользователям"
+    )
+    system_name: Mapped[str] = mapped_column(String(100), unique=True, comment="Системное имя разрешения")
+    description: Mapped[str | None] = mapped_column(comment="Описание разрешения")
