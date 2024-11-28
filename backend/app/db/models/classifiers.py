@@ -28,10 +28,10 @@ class Roles(Base, UUIDPrimaryKey):
     )
 
 
-class Permission(Base, SmallIntPrimaryKey):
-    """Классификатор возможных разрешений."""
+class GlobalPermission(Base, SmallIntPrimaryKey):
+    """Классификатор глобальных возможных разрешений."""
 
-    __tablename__ = "permissions"
+    __tablename__ = "global_permissions"
 
     display_name: Mapped[str] = mapped_column(
         String(100), unique=True, comment="Имя разрешения для отображения пользователям"

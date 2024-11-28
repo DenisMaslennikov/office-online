@@ -15,7 +15,7 @@ class SubjectPermissionCompany(Base, BigIntPrimaryKey):
     __table_args__ = {
         "constraints": (
             UniqueConstraint(
-                "role_id", "user_id", "permission_id", "company_id", name="uq_subject_permissions_company"
+                "role_id", "user_id", "global_permission_id", "company_id", name="uq_subject_permissions_company"
             ),
             CheckConstraint(
                 "(role_id IS NOT NULL AND user_id IS NULL) OR (role_id IS NULL AND user_id IS NOT NULL)",
@@ -30,8 +30,8 @@ class SubjectPermissionCompany(Base, BigIntPrimaryKey):
     user_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
     )
-    permission_id: Mapped[int] = mapped_column(
-        SMALLINT, ForeignKey("permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
+    global_permission_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("global_permissions.id", ondelete="CASCADE"), comment="Идентификатор разрешения"
     )
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
