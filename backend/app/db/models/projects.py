@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint
+from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -22,3 +22,4 @@ class Project(Base, UUIDPrimaryKeyMixin):
     prefix: Mapped[str] = mapped_column(String(50), comment="Префикс проекта")
     description: Mapped[str | None] = mapped_column(comment="Описание проекта")
     company_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("companies.id"), comment="Идентификатор организации")
+    icon_id: Mapped[int] = mapped_column(BIGINT, ForeignKey("icons.id", ondelete="RESTRICT"))
