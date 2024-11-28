@@ -9,6 +9,8 @@ from app.db.models.mixins import UUIDPrimaryKeyMixin
 
 
 class Board(Base, UUIDPrimaryKeyMixin):
+    """Модель доски для учета задач."""
+
     __tablename__ = "boards"
     __table_args__ = {"constraints": (UniqueConstraint("project_id", "name", name="uq_board_name"),)}
 
