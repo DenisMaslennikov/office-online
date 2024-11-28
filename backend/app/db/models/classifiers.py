@@ -1,7 +1,6 @@
 import uuid
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.mysql import BIGINT
+from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -63,3 +62,26 @@ class TaskType(Base, BigIntPrimaryKeyMixin):
     project_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
+
+
+class Icon(Base, BigIntPrimaryKeyMixin):
+    """Пополняемый классификатор для хранения ссылок на иконки."""
+
+    __tablename__ = "icons"
+
+    company_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
+    )
+    file_name: Mapped[str] = mapped_column(comment="Имя файла", unique=True)
+    icon_category_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("icons_categories.id"), comment="Идентификатор категории иконок"
+    )
+
+
+class IconCategory(Base, SmallIntPrimaryKeyMixin):
+    """Модель классификатора категорий иконок."""
+
+    __tablename__ = "icons_categories"
+
+    name: Mapped[str] = mapped_column(String(100), comment="Наименование категории иконок")
+    description: Mapped[str] = mapped_column(comment="Описание категории иконок")
