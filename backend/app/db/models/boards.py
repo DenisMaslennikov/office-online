@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import UniqueConstraint, String, ForeignKey, TIMESTAMP, func, SMALLINT, text
+from sqlalchemy import UniqueConstraint, String, ForeignKey, TIMESTAMP, func, SMALLINT, text, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -16,7 +16,9 @@ class Board(Base, UUIDPrimaryKeyMixin):
 
     name: Mapped[str] = mapped_column(String(255), comment="Имя доски")
     description: Mapped[str | None] = mapped_column(comment="Описание доски")
-    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id"), comment="идентификатор проекта")
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), comment="идентификатор проекта"
+    )
     start_time: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Дата начала")
     end_time: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Дата окончания")
     archived_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Дата архивации")
@@ -43,4 +45,28 @@ class BoardColumn(Base, UUIDPrimaryKeyMixin):
         comment="Автоматический помечать задачу как выполненную при перемещение в столбец",
         default=False,
         server_default=text("false"),
+    )
+
+
+class BoardTemplate(Base, UUIDPrimaryKeyMixin):
+    """Модель доски для учета задач."""
+
+    __tablename__ = "boards_templates"
+    __table_args__ = {
+        "constraints": (
+            UniqueConstraint("company_id", "project_id", "name", name="uq_board_template_name"),
+            CheckConstraint(
+                "(company_id IS NOT NULL AND project_id IS NULL) OR (company_id IS NULL AND project_id IS NOT NULL)",
+                name="chk_company_or_project",
+            ),
+        )
+    }
+
+    name: Mapped[str] = mapped_column(String(255), comment="Имя шаблона доски")
+    description: Mapped[str | None] = mapped_column(comment="Описание доски")
+    company_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
+    )
+    project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
