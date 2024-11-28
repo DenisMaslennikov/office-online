@@ -70,3 +70,26 @@ class BoardTemplate(Base, UUIDPrimaryKeyMixin):
     project_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
+
+
+class BoardsTemplatesColumns(Base, UUIDPrimaryKeyMixin):
+    """Модель столбцов для шаблонов досок."""
+
+    __tablename__ = "boards_templates_columns"
+    __table_args__ = {"constraints": (UniqueConstraint("board_template_id", "name", name="uq_board_templates_name"),)}
+
+    board_template_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("boards_templates.id", ondelete="CASCADE"), comment="Идентификатор шаблона доски"
+    )
+    name: Mapped[str] = mapped_column(String(100), comment="Имя столбца")
+    description: Mapped[str | None] = mapped_column(comment="Описание столбца")
+    number: Mapped[int] = mapped_column(SMALLINT, comment="Номер столбца по порядку")
+    color: Mapped[str] = mapped_column(String(9), comment="Цвет столбца")
+    max_task: Mapped[int] = mapped_column(
+        SMALLINT, comment="Ограничение по числу задач в столбце", default=0, server_default=text("0")
+    )
+    mark_task_as_completed: Mapped[bool] = mapped_column(
+        comment="Автоматический помечать задачу как выполненную при перемещение в столбец",
+        default=False,
+        server_default=text("false"),
+    )
