@@ -4,10 +4,10 @@ from sqlalchemy import ForeignKey, SMALLINT, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
-from app.db.models.mixins import BigIntPrimaryKey
+from app.db.models.mixins import BigIntPrimaryKeyMixin
 
 
-class SubjectPermissionCompany(Base, BigIntPrimaryKey):
+class SubjectPermissionCompany(Base, BigIntPrimaryKeyMixin):
     """Разрешения для роли или пользователя в компании."""
 
     __tablename__ = "subject_permissions_company"
@@ -38,7 +38,7 @@ class SubjectPermissionCompany(Base, BigIntPrimaryKey):
     )
 
 
-class CompanyUserRole(Base, BigIntPrimaryKey):
+class CompanyUserRole(Base, BigIntPrimaryKeyMixin):
     """Роли пользователей в компании."""
 
     __tablename__ = "company_users_roles"

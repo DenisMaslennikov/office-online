@@ -4,7 +4,7 @@ from sqlalchemy import text, BIGINT, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class UUIDPrimaryKey:
+class UUIDPrimaryKeyMixin:
     """UUID первичный ключ для моделей алхимии."""
 
     id: Mapped[UUID] = mapped_column(
@@ -15,7 +15,7 @@ class UUIDPrimaryKey:
     )
 
 
-class BigIntPrimaryKey:
+class BigIntPrimaryKeyMixin:
     """Большой целочисленный первичный ключ для моделей алхимии."""
 
     id: Mapped[int] = mapped_column(
@@ -25,7 +25,7 @@ class BigIntPrimaryKey:
     )
 
 
-class SmallIntPrimaryKey:
+class SmallIntPrimaryKeyMixin:
     """Маленький целочисленный первичный ключ для моделей алхимии."""
 
     id: Mapped[int] = mapped_column(

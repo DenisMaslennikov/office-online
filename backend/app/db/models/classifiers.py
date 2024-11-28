@@ -4,10 +4,10 @@ from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
-from app.db.models.mixins import SmallIntPrimaryKey, UUIDPrimaryKey
+from app.db.models.mixins import SmallIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
 
-class Timezones(Base, SmallIntPrimaryKey):
+class Timezones(Base, SmallIntPrimaryKeyMixin):
     """Классификатор часовых поясов."""
 
     __tablename__ = "timezones"
@@ -16,7 +16,7 @@ class Timezones(Base, SmallIntPrimaryKey):
     iana_name: Mapped[str] = mapped_column(String(256), comment="Наименование IANA часового пояса")
 
 
-class Roles(Base, UUIDPrimaryKey):
+class Roles(Base, UUIDPrimaryKeyMixin):
     """Пополняемый классификатор ролей."""
 
     __tablename__ = "roles"
@@ -28,7 +28,7 @@ class Roles(Base, UUIDPrimaryKey):
     )
 
 
-class GlobalPermission(Base, SmallIntPrimaryKey):
+class GlobalPermission(Base, SmallIntPrimaryKeyMixin):
     """Классификатор глобальных возможных разрешений."""
 
     __tablename__ = "global_permissions"

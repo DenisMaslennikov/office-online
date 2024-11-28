@@ -1,11 +1,11 @@
 from sqlalchemy import String, SMALLINT, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db.models.mixins import UUIDPrimaryKey
+from app.db.models.mixins import UUIDPrimaryKeyMixin
 from app.db.models.base import Base
 
 
-class User(Base, UUIDPrimaryKey):
+class User(Base, UUIDPrimaryKeyMixin):
     """Модель пользователя."""
 
     __tablename__ = "users"
