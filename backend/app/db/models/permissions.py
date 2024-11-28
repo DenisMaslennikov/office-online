@@ -53,3 +53,30 @@ class CompanyUserRole(Base, BigIntPrimaryKeyMixin):
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
     )
     role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли")
+
+
+class SubjectPermissionProject(Base, BigIntPrimaryKeyMixin):
+    """Права роли или пользователя на проекте."""
+
+    __tablename__ = "subject_permissions_project"
+    __table_args__ = {
+        "constraints": (
+            UniqueConstraint(
+                "project_id", "user_id", "role_id", "project_permission_id", name="uq_subject_permissions_project"
+            ),
+            CheckConstraint(
+                "(role_id IS NOT NULL AND user_id IS NULL) OR (role_id IS NULL AND user_id IS NOT NULL)",
+                name="chk_role_or_user",
+            ),
+        )
+    }
+    role_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли"
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
+    )
+    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
+    project_permission_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("project_permissions.id", ondelete="RESTRICT")
+    )
