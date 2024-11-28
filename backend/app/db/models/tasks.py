@@ -5,7 +5,7 @@ from sqlalchemy import String, ForeignKey, TIMESTAMP, BIGINT, func, UniqueConstr
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
-from app.db.models.mixins import UUIDPrimaryKeyMixin
+from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
 
 
 class Task(Base, UUIDPrimaryKeyMixin):
@@ -31,3 +31,16 @@ class Task(Base, UUIDPrimaryKeyMixin):
     updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Обновлена")
     completed_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Выполнена")
     archived_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Архивирована")
+
+
+class ChildTask(Base, BigIntPrimaryKeyMixin):
+    """Дочерние задачи."""
+
+    __tablename__ = "child_tasks"
+
+    parent_task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор родительской задачи"
+    )
+    child_task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор дочерней задачи"
+    )
