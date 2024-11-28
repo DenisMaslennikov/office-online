@@ -40,5 +40,7 @@ class BoardColumn(Base, UUIDPrimaryKeyMixin):
         SMALLINT, comment="Ограничение по числу задач в столбце", default=0, server_default=text("0")
     )
     mark_task_as_completed: Mapped[bool] = mapped_column(
-        comment="Автоматический помечать задачу как выполненную при перемещение в столбец"
+        comment="Автоматический помечать задачу как выполненную при перемещение в столбец",
+        default=False,
+        server_default=text("false"),
     )
