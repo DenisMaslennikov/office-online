@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db.models import Base
+from app.db.models.base import Base
 from app.db.models.mixins import SmallIntPrimaryKey, UUIDPrimaryKey
 
 
