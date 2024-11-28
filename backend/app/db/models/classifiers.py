@@ -4,7 +4,7 @@ from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
-from app.db.models.mixins import SmallIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
+from app.db.models.mixins import SmallIntPrimaryKeyMixin, UUIDPrimaryKeyMixin, PermissionClassifierMixin
 
 
 class Timezones(Base, SmallIntPrimaryKeyMixin):
@@ -28,13 +28,13 @@ class Roles(Base, UUIDPrimaryKeyMixin):
     )
 
 
-class GlobalPermission(Base, SmallIntPrimaryKeyMixin):
+class GlobalPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
     """Классификатор глобальных возможных разрешений."""
 
     __tablename__ = "global_permissions"
 
-    display_name: Mapped[str] = mapped_column(
-        String(100), unique=True, comment="Имя разрешения для отображения пользователям"
-    )
-    system_name: Mapped[str] = mapped_column(String(100), unique=True, comment="Системное имя разрешения")
-    description: Mapped[str | None] = mapped_column(comment="Описание разрешения")
+
+class ProjectPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
+    """Классификатор возможных разрешений для проекта."""
+
+    __tablename__ = "project_permissions"
