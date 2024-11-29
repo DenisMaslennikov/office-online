@@ -44,6 +44,7 @@ class File(Base, UUIDPrimaryKeyMixin):
     size: Mapped[int] = mapped_column(BIGINT, comment="Размер файла")
     created_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP, comment="Время создания")
     updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Время последнего обновления")
+    checksum: Mapped[str] = mapped_column(String(64), comment="Чексумма файла")
 
 
 class FileInGroup(Base, BigIntPrimaryKeyMixin):
