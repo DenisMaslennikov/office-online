@@ -52,6 +52,12 @@ class FileGroupPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMix
     __tablename__ = "file_group_permissions"
 
 
+class ChannelPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
+    """Классификатор возможных разрешений для каналов чата."""
+
+    __tablename__ = "channel_permissions"
+
+
 class TaskType(Base, BigIntPrimaryKeyMixin):
     """Пополняемый классификатор типов задач."""
 
