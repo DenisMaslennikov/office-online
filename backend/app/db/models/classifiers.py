@@ -73,8 +73,6 @@ class Icon(Base, BigIntPrimaryKeyMixin):
     company_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("companies.id", ondelete="SET DEFAULT"),
         comment="Идентификатор организации",
-        # TODO записать в default id специальной организации "удаленная организация" и дописать celery на удаление
-        #  файлов связанных с удаленной организацией
         default=DELETED_COMPANY_ID,
     )
     file_name: Mapped[str] = mapped_column(comment="Имя файла", unique=True)
