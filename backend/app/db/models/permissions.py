@@ -135,7 +135,7 @@ class SubjectPermissionChannel(Base, BigIntPrimaryKeyMixin):
         ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли"
     )
     channel_permission_id: Mapped[int] = mapped_column(
-        SMALLINT, ForeignKey("channel_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
+        SMALLINT, ForeignKey("channels_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )
 
 
@@ -164,5 +164,5 @@ class SubjectPermissionChannelsGroup(Base, BigIntPrimaryKeyMixin):
         ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли"
     )
     channel_permission_id: Mapped[int] = mapped_column(
-        SMALLINT, ForeignKey("channel_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
+        SMALLINT, ForeignKey("channels_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )
