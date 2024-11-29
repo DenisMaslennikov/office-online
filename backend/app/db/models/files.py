@@ -60,3 +60,17 @@ class FileInGroup(Base, BigIntPrimaryKeyMixin):
     files_group_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
     )
+
+
+class TaskAttachments(Base, BigIntPrimaryKeyMixin):
+    """Файлы прикрепленные к задаче."""
+
+    __tablename__ = "task_attachments"
+    __table_args__ = {"constraints": (UniqueConstraint("task_id", "file_id", name="uq_task_attachments"),)}
+
+    task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
+    )
+    file_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
+    )
