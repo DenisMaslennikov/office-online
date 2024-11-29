@@ -62,7 +62,7 @@ class FileInGroup(Base, BigIntPrimaryKeyMixin):
     )
 
 
-class TaskAttachments(Base, BigIntPrimaryKeyMixin):
+class TaskAttachment(Base, BigIntPrimaryKeyMixin):
     """Файлы прикрепленные к задаче."""
 
     __tablename__ = "task_attachments"
