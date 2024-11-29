@@ -112,3 +112,57 @@ class SubjectPermissionFileGroup(Base, BigIntPrimaryKeyMixin):
     file_group_permission_id: Mapped[int] = mapped_column(
         SMALLINT, ForeignKey("file_group_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )
+
+
+class SubjectPermissionChannel(Base, BigIntPrimaryKeyMixin):
+    """Права на канал чата."""
+
+    __tablename__ = "subject_permissions_channels"
+    __table_args__ = {
+        "constraints": (
+            UniqueConstraint("channel_id", "user_id", "channel_permissions_id", name="uq_user_permissions_chanel"),
+            UniqueConstraint("channel_id", "role_id", "channel_permissions_id", name="uq_role_permissions_chanel"),
+        )
+    }
+
+    channel_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
+    )
+    role_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли"
+    )
+    channel_permission_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("channel_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
+    )
+
+
+class SubjectPermissionChannelsGroup(Base, BigIntPrimaryKeyMixin):
+    """Права на группу каналов чата."""
+
+    __tablename__ = "subject_permissions_channels_groups"
+    __table_args__ = {
+        "constraints": (
+            UniqueConstraint(
+                "channels_group_id", "user_id", "channel_permissions_id", name="uq_user_permissions_chanel_group"
+            ),
+            UniqueConstraint(
+                "channels_group_id", "role_id", "channel_permissions_id", name="uq_role_permissions_chanel_group"
+            ),
+        )
+    }
+
+    channels_group_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("channels_groups.id", ondelete="CASCADE"), comment="Идентификатор группы каналов"
+    )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
+    )
+    role_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли"
+    )
+    channel_permission_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("channel_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
+    )
