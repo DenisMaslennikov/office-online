@@ -58,3 +58,26 @@ class TaskResponsible(Base, BigIntPrimaryKeyMixin):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя ответственного за задачу"
     )
+
+
+class TaskComment(Base, UUIDPrimaryKeyMixin):
+    """Модель комментария к задаче."""
+
+    __tablename__ = "task_comments"
+
+    task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="SET DEFAULT"),
+        # TODO записать в default id специального пользователя "удаленный пользователь"
+        default="dddddddd-dddd-dddd-dddd-dddddddddddd",
+        comment="Идентификатор пользователя создавшего комментарий",
+    )
+    content: Mapped[str] = mapped_column(comment="Содержание комментария")
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        TIMESTAMP, comment="Дата и время создания комментария", server_default=func.now()
+    )
+    updated_at: Mapped[datetime.datetime | None] = mapped_column(
+        TIMESTAMP, comment="Дата и время последнего обновления комментария"
+    )
