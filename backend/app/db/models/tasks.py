@@ -44,3 +44,17 @@ class ChildTask(Base, BigIntPrimaryKeyMixin):
     child_task_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор дочерней задачи"
     )
+
+
+class TaskResponsible(Base, BigIntPrimaryKeyMixin):
+    """Ответственные за задачу."""
+
+    __tablename__ = "task_responsibles"
+    __table_args__ = {"constraints": (UniqueConstraint("user_id", "task_id", name="uq_task_responsible"),)}
+
+    task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя ответственного за задачу"
+    )
