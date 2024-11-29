@@ -42,3 +42,18 @@ class File(Base, UUIDPrimaryKeyMixin):
     size: Mapped[int] = mapped_column(BIGINT, comment="Размер файла")
     created_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP, comment="Время создания")
     updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Время последнего обновления")
+
+
+class FileInGroup(Base, BigIntPrimaryKeyMixin):
+    """Привязка файла к группе."""
+
+    __tablename__ = "files_in_groups"
+    __table_args__ = {"constraints": (UniqueConstraint("file_id", "file_group_id", name="uq_file_in_group"),)}
+
+    file_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
+    )
+    # TODO Тригер если групп осталось 0 то помещаем в корзину
+    files_group_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
+    )
