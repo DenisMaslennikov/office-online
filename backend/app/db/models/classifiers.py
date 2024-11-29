@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.constants import DELETED_COMPANY_ID
+from app.constants import DELETED_COMPANY_ID, DEFAULT_TASK_TYPE_ICON_ID
 from app.db.models.base import Base
 from app.db.models.mixins import (
     SmallIntPrimaryKeyMixin,
@@ -55,7 +55,10 @@ class TaskType(Base, BigIntPrimaryKeyMixin):
     name: Mapped[str] = mapped_column(String(100), comment="Наименование типа задачи")
     description: Mapped[str] = mapped_column(comment="Описание типа задачи")
     icon_id: Mapped[int] = mapped_column(
-        BIGINT, ForeignKey("icons.id", ondelete="RESTRICT"), comment="Идентификатор иконки"
+        BIGINT,
+        ForeignKey("icons.id", ondelete="SET DEFAULT"),
+        comment="Идентификатор иконки",
+        default=DEFAULT_TASK_TYPE_ICON_ID,
     )
     company_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"

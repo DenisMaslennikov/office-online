@@ -16,6 +16,18 @@ DELETED_COMPANY_ID = "dddddddd-dddd-dddd-dddd-dddddddddddd"
 # TODO записать id специального пользователя "удаленный пользователь"
 DELETED_USER_ID = "dddddddd-dddd-dddd-dddd-dddddddddddd"
 
+# ID Иконки для файлов по умолчанию.
+# TODO Заменить на id иконки для группы файлов по умолчанию
+DEFAULT_FILE_GROUP_ICON_ID = 1
+
+# ID Иконки для проекта по умолчанию.
+# TODO Заменить на id иконки для проекта по умолчанию
+DEFAULT_PROJECT_ICON_ID = 2
+
+# ID Иконки для типа задачи по умолчанию.
+# TODO Заменить на id иконки для типа задачи по умолчанию
+DEFAULT_TASK_TYPE_ICON_ID = 3
+
 # Корневая директория проекта.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
