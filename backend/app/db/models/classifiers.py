@@ -107,3 +107,4 @@ class FileGroupType(Base, SmallIntPrimaryKeyMixin):
     display_name: Mapped[str] = mapped_column(String(100), comment="Наименование группы файлов", unique=True)
     system_name: Mapped[str] = mapped_column(String(100), comment="Системное имя типа группы файлов", unique=True)
     system: Mapped[bool] = mapped_column(comment="Системная группа (нельзя менять права по умолчанию)")
+    trash: Mapped[bool] = mapped_column(comment="Признак того что группа является корзиной")
