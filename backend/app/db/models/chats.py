@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import LtreeType
 
 from app.db.models.base import Base
-from app.db.models.mixins import BigIntPrimaryKeyMixin
+from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
 
 class ChannelsGroup(Base, BigIntPrimaryKeyMixin):
@@ -21,4 +21,11 @@ class ChannelsGroup(Base, BigIntPrimaryKeyMixin):
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
     system: Mapped[bool] = mapped_column(comment="Является системной")
-    number: Mapped[int] = mapped_column(SMALLINT, comment="Порядок при сортировке")
+    order: Mapped[int] = mapped_column(SMALLINT, comment="Порядок при сортировке")
+
+
+class Channels(Base, UUIDPrimaryKeyMixin):
+    """Каналы."""
+
+    __tablename__ = "channels"
+    __table_args__ = {"constraints": (UniqueConstraint("name", "company_id", name="uq_channel_name"),)}

@@ -14,9 +14,8 @@ class SubjectPermissionCompany(Base, BigIntPrimaryKeyMixin):
 
     __table_args__ = {
         "constraints": (
-            UniqueConstraint(
-                "role_id", "user_id", "global_permission_id", "company_id", name="uq_subject_permissions_company"
-            ),
+            UniqueConstraint("role_id", "global_permission_id", "company_id", name="uq_role_permissions_company"),
+            UniqueConstraint("user_id", "global_permission_id", "company_id", name="uq_user_permissions_company"),
             CheckConstraint(
                 "(role_id IS NOT NULL AND user_id IS NULL) OR (role_id IS NULL AND user_id IS NOT NULL)",
                 name="chk_role_or_user",
@@ -61,9 +60,8 @@ class SubjectPermissionProject(Base, BigIntPrimaryKeyMixin):
     __tablename__ = "subject_permissions_project"
     __table_args__ = {
         "constraints": (
-            UniqueConstraint(
-                "project_id", "user_id", "role_id", "project_permission_id", name="uq_subject_permissions_project"
-            ),
+            UniqueConstraint("project_id", "role_id", "project_permission_id", name="uq_role_permissions_project"),
+            UniqueConstraint("project_id", "user_id", "project_permission_id", name="uq_user_permissions_project"),
             CheckConstraint(
                 "(role_id IS NOT NULL AND user_id IS NULL) OR (role_id IS NULL AND user_id IS NOT NULL)",
                 name="chk_role_or_user",
@@ -90,11 +88,10 @@ class SubjectPermissionFileGroup(Base, BigIntPrimaryKeyMixin):
     __table_args__ = {
         "constraints": (
             UniqueConstraint(
-                "file_group_id",
-                "user_id",
-                "role_id",
-                "file_group_permission_id",
-                name="uq_subject_file_group_permission",
+                "file_group_id", "role_id", "file_group_permission_id", name="uq_role_file_group_permission"
+            ),
+            UniqueConstraint(
+                "file_group_id", "user_id", "file_group_permission_id", name="uq_user_file_group_permission"
             ),
             CheckConstraint(
                 "(role_id IS NOT NULL AND user_id IS NULL) OR (role_id IS NULL AND user_id IS NOT NULL)",

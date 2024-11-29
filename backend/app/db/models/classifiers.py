@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT, SMALLINT
+from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT, SMALLINT, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DELETED_COMPANY_ID, DEFAULT_TASK_TYPE_ICON_ID
@@ -56,7 +56,16 @@ class TaskType(Base, BigIntPrimaryKeyMixin):
     """Пополняемый классификатор типов задач."""
 
     __tablename__ = "task_types"
-    __table_args__ = {"constraints": (UniqueConstraint("name", "company_id", "project_id", name="uq_task_type_name"),)}
+    __table_args__ = {
+        "constraints": (
+            UniqueConstraint("name", "company_id", name="uq_task_type_name_for_company"),
+            UniqueConstraint("name", "project_id", name="uq_task_type_name_for_project"),
+            CheckConstraint(
+                "(company_id IS NOT NULL AND project_id IS NULL) OR (company_id IS NULL AND project_id IS NOT NULL)",
+                name="chk_company_or_project",
+            ),
+        ),
+    }
 
     name: Mapped[str] = mapped_column(String(100), comment="Наименование типа задачи")
     description: Mapped[str] = mapped_column(comment="Описание типа задачи")

@@ -54,7 +54,8 @@ class BoardTemplate(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "boards_templates"
     __table_args__ = {
         "constraints": (
-            UniqueConstraint("company_id", "project_id", "name", name="uq_board_template_name"),
+            UniqueConstraint("project_id", "name", name="uq_board_template_name_for_project"),
+            UniqueConstraint("company_id", "name", name="uq_board_template_name_for_company"),
             CheckConstraint(
                 "(company_id IS NOT NULL AND project_id IS NULL) OR (company_id IS NULL AND project_id IS NOT NULL)",
                 name="chk_company_or_project",
