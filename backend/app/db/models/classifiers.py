@@ -46,6 +46,12 @@ class ProjectPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin
     __tablename__ = "project_permissions"
 
 
+class FileGroupPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
+    """Классификатор возможных разрешений для группы файлов."""
+
+    __tablename__ = "file_group_permissions"
+
+
 class TaskType(Base, BigIntPrimaryKeyMixin):
     """Пополняемый классификатор типов задач."""
 
