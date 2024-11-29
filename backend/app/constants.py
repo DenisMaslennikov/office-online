@@ -1,4 +1,5 @@
 import re
+from datetime import timedelta
 from pathlib import Path
 
 from fastapi import status
@@ -27,6 +28,15 @@ DEFAULT_PROJECT_ICON_ID = 2
 # ID Иконки для типа задачи по умолчанию.
 # TODO Заменить на id иконки для типа задачи по умолчанию
 DEFAULT_TASK_TYPE_ICON_ID = 3
+
+# Интервал по умолчанию для удаления компании.
+# TODO Написать задачу для Celery для удаления компании
+COMPANY_DELETION_TIMEDELTA = timedelta(days=30)
+
+# Интервал по умолчанию для удаления компании.
+# TODO Написать задачу для Celery для удаления пользователя
+USER_DELETION_TIMEDELTA = timedelta(days=30)
+
 
 # Корневая директория проекта.
 BASE_DIR = Path(__file__).resolve().parent.parent

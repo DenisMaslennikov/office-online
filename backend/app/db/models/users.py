@@ -1,4 +1,6 @@
-from sqlalchemy import String, SMALLINT, ForeignKey, text
+import datetime
+
+from sqlalchemy import String, SMALLINT, ForeignKey, text, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.mixins import UUIDPrimaryKeyMixin
@@ -27,6 +29,9 @@ class User(Base, UUIDPrimaryKeyMixin):
         comment="Является ли пользователь ботом", server_default=text("false"), default=False
     )
     active: Mapped[bool] = mapped_column(comment="Активен ли аккаунт пользователя", default=True, server_default="true")
+    scheduled_deletion_date: Mapped[datetime.datetime] = mapped_column(
+        TIMESTAMP, comment="Запланированная дата удаления"
+    )
 
     def __repr__(self):
         return self.username
