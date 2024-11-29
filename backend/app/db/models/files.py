@@ -88,3 +88,17 @@ class CommentAttachment(Base, BigIntPrimaryKeyMixin):
     file_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
     )
+
+
+class MessageAttachment(Base, BigIntPrimaryKeyMixin):
+    """Файлы прикрепленные к сообщениям в чате."""
+
+    __tablename__ = "task_attachments"
+    __table_args__ = {"constraints": (UniqueConstraint("message_id", "file_id", name="uq_message_attachment"),)}
+
+    message_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("message.id", ondelete="CASCADE"), comment="Идентификатор сообщения"
+    )
+    file_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
+    )
