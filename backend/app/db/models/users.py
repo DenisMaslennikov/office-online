@@ -13,6 +13,7 @@ class User(Base, UUIDPrimaryKeyMixin):
     email: Mapped[str] = mapped_column(String(100), comment="Почта", unique=True)
     username: Mapped[str] = mapped_column(String(30), comment="Имя пользователя", unique=True)
     hashed_password: Mapped[str] = mapped_column(comment="Хеш пароля")
+    phone: Mapped[str] = mapped_column(String(30), comment="Номер телефона")
     first_name: Mapped[str | None] = mapped_column(String(30), comment="Имя")
     second_name: Mapped[str | None] = mapped_column(String(30), comment="Фамилия")
     middle_name: Mapped[str | None] = mapped_column(String(30), comment="Отчество")
