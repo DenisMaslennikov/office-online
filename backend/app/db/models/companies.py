@@ -14,7 +14,7 @@ class Company(Base, UUIDPrimaryKeyMixin):
 
     name: Mapped[str] = mapped_column(comment="Наименование организации")
     description: Mapped[str | None] = mapped_column(comment="Описание организации")
-    subdomain: Mapped[str] = mapped_column(String(50), comment="Субдомен организации")
+    subdomain: Mapped[str] = mapped_column(String(50), comment="Субдомен организации", unique=True)
     timezone_id: Mapped[int] = mapped_column(
         SMALLINT,
         ForeignKey("timezones.id", ondelete="RESTRICT"),
