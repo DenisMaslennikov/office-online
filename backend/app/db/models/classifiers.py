@@ -97,3 +97,13 @@ class IconCategory(Base, SmallIntPrimaryKeyMixin):
 
     name: Mapped[str] = mapped_column(String(100), comment="Наименование категории иконок")
     description: Mapped[str] = mapped_column(comment="Описание категории иконок")
+
+
+class FileGroupType(Base, SmallIntPrimaryKeyMixin):
+    """Классификатор типов групп."""
+
+    __tablename__ = "file_group_types"
+
+    display_name: Mapped[str] = mapped_column(String(100), comment="Наименование группы файлов", unique=True)
+    system_name: Mapped[str] = mapped_column(String(100), comment="Системное имя типа группы файлов", unique=True)
+    system: Mapped[bool] = mapped_column(comment="Системная группа (нельзя менять права по умолчанию)")

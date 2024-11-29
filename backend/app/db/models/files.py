@@ -1,12 +1,12 @@
 import datetime
 import uuid
 
-from sqlalchemy import UniqueConstraint, String, BIGINT, ForeignKey, TIMESTAMP, text
+from sqlalchemy import UniqueConstraint, String, BIGINT, ForeignKey, TIMESTAMP, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DEFAULT_FILE_GROUP_ICON_ID, DELETED_COMPANY_ID
 from app.db.models.base import Base
-from app.db.models.mixins import UUIDPrimaryKeyMixin
+from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
 
 
 class FilesGroup(Base, UUIDPrimaryKeyMixin):
@@ -26,7 +26,7 @@ class FilesGroup(Base, UUIDPrimaryKeyMixin):
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
-    system: Mapped[bool] = mapped_column(comment="Системная группа", default=False, server_default=text("false"))
+    file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
 
 
 class File(Base, UUIDPrimaryKeyMixin):
