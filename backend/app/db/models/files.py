@@ -66,10 +66,24 @@ class TaskAttachment(Base, BigIntPrimaryKeyMixin):
     """Файлы прикрепленные к задаче."""
 
     __tablename__ = "task_attachments"
-    __table_args__ = {"constraints": (UniqueConstraint("task_id", "file_id", name="uq_task_attachments"),)}
+    __table_args__ = {"constraints": (UniqueConstraint("task_id", "file_id", name="uq_task_attachment"),)}
 
     task_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
+    )
+    file_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
+    )
+
+
+class CommentAttachment(Base, BigIntPrimaryKeyMixin):
+    """Файлы прикрепленные к комментариям."""
+
+    __tablename__ = "task_attachments"
+    __table_args__ = {"constraints": (UniqueConstraint("task_comment_id", "file_id", name="uq_comment_attachment"),)}
+
+    task_comment_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("task_comments.id", ondelete="CASCADE"), comment="Идентификатор комментария"
     )
     file_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
