@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import UniqueConstraint, String, BIGINT, ForeignKey, TIMESTAMP, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy_utils import LtreeType
 
 from app.constants import DEFAULT_FILE_GROUP_ICON_ID, DELETED_COMPANY_ID
 from app.db.models.base import Base
@@ -27,6 +28,7 @@ class FilesGroup(Base, UUIDPrimaryKeyMixin):
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
     file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
+    path: Mapped[LtreeType] = mapped_column(comment="Путь к группе")
 
 
 class File(Base, UUIDPrimaryKeyMixin):
