@@ -10,7 +10,7 @@ from app.db.models.base import Base
 from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
 
 
-class FilesGroup(Base, UUIDPrimaryKeyMixin):
+class FilesGroup(Base, BigIntPrimaryKeyMixin):
     """Группы файлов."""
 
     __tablename__ = "files_groups"
@@ -57,8 +57,8 @@ class FileInGroup(Base, BigIntPrimaryKeyMixin):
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
     )
     # TODO Тригер если групп осталось 0 то помещаем в корзину
-    files_group_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
+    files_group_id: Mapped[int] = mapped_column(
+        BIGINT, ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
     )
 
 
