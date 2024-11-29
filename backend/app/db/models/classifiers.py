@@ -3,6 +3,7 @@ import uuid
 from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.constants import DELETED_COMPANY_ID
 from app.db.models.base import Base
 from app.db.models.mixins import (
     SmallIntPrimaryKeyMixin,
@@ -70,7 +71,11 @@ class Icon(Base, BigIntPrimaryKeyMixin):
     __tablename__ = "icons"
 
     company_id: Mapped[uuid.UUID | None] = mapped_column(
-        ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
+        ForeignKey("companies.id", ondelete="SET DEFAULT"),
+        comment="Идентификатор организации",
+        # TODO записать в default id специальной организации "удаленная организация" и дописать celery на удаление
+        #  файлов связанных с удаленной организацией
+        default=DELETED_COMPANY_ID,
     )
     file_name: Mapped[str] = mapped_column(comment="Имя файла", unique=True)
     icon_category_id: Mapped[int] = mapped_column(

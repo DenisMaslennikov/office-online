@@ -4,6 +4,7 @@ import uuid
 from sqlalchemy import String, ForeignKey, TIMESTAMP, BIGINT, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.constants import DELETED_USER_ID
 from app.db.models.base import Base
 from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
 
@@ -71,7 +72,7 @@ class TaskComment(Base, UUIDPrimaryKeyMixin):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="SET DEFAULT"),
         # TODO записать в default id специального пользователя "удаленный пользователь"
-        default="dddddddd-dddd-dddd-dddd-dddddddddddd",
+        default=DELETED_USER_ID,
         comment="Идентификатор пользователя создавшего комментарий",
     )
     content: Mapped[str] = mapped_column(comment="Содержание комментария")
