@@ -71,7 +71,6 @@ class TaskComment(Base, UUIDPrimaryKeyMixin):
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="SET DEFAULT"),
-        # TODO записать в default id специального пользователя "удаленный пользователь"
         default=DELETED_USER_ID,
         comment="Идентификатор пользователя создавшего комментарий",
     )
