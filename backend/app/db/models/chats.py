@@ -71,3 +71,22 @@ class Message(Base, BigIntPrimaryKeyMixin):
         default=DELETED_MESSAGE_ID,
         comment="Идентификатор цитируемого сообщения",
     )
+
+
+class LastReadMessageByUser(Base, BigIntPrimaryKeyMixin):
+    """Модель хранящее последнее прочитанное сообщение в чате для пользователя."""
+
+    __tablename__ = "last_read_message_by_user"
+    __table_args__ = {
+        "constraints": (UniqueConstraint("user_id", "channel_id", name="uq_last_read_message_by_user_chanel"),)
+    }
+
+    message_id: Mapped[int] = mapped_column(
+        BIGINT, ForeignKey("messages.id", ondelete="CASCADE"), comment="Идентификатор сообщения"
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
+    )
+    channel_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
+    )
