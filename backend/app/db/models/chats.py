@@ -5,7 +5,6 @@ from sqlalchemy import String, ForeignKey, SMALLINT, UniqueConstraint, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import LtreeType
 
-from alembic_autogenerate import message
 from app.constants import DELETED_USER_ID, DELETED_MESSAGE_ID
 from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
@@ -56,12 +55,16 @@ class Message(Base, BigIntPrimaryKeyMixin):
         ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="SET DEFAULT"), comment="Идентификатор пользователя", default=DELETED_USER_ID
+        ForeignKey("users.id", ondelete="SET DEFAULT"),
+        comment="Идентификатор пользователя",
+        default=DELETED_USER_ID,
     )
     created_at: Mapped[datetime.datetime] = mapped_column(
         TIMESTAMP, server_default=func.now(), comment="Время создания сообщения"
     )
-    updated_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP, comment="Время последнего изменения сообщения")
+    updated_at: Mapped[datetime.datetime | None] = mapped_column(
+        TIMESTAMP, comment="Время последнего изменения сообщения"
+    )
     quoted_message_id: Mapped[int] = mapped_column(
         BIGINT,
         ForeignKey("messages.id", ondelete="SET DEFAULT"),
