@@ -29,6 +29,10 @@ DEFAULT_PROJECT_ICON_ID = 2
 # TODO Заменить на id иконки для типа задачи по умолчанию
 DEFAULT_TASK_TYPE_ICON_ID = 3
 
+# ID удаленного сообщения.
+# TODO Заменить на id удаленного сообщения
+DELETED_MESSAGE_ID = 1
+
 # Интервал по умолчанию для удаления компании.
 # TODO Написать задачу для Celery для удаления компании
 COMPANY_DELETION_TIMEDELTA = timedelta(days=30)
