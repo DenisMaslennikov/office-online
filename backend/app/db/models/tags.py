@@ -49,3 +49,18 @@ class TaskTag(Base, BigIntPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<TaskTag {self.task_id} - {self.tag_id}>"
+
+
+class FileTag(Base, BigIntPrimaryKeyMixin):
+    """Теги на файлах."""
+
+    __tablename__ = "files_tags"
+    __table_args__ = {"constraints": (UniqueConstraint("tag_id", "file_id", name="uq_file_tag"),)}
+
+    tag_id: Mapped[int] = mapped_column(BIGINT, ForeignKey("tags.id", ondelete="CASCADE"), comment="Идентификатор тега")
+    file_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
+    )
+
+    def __repr__(self):
+        return f"<FileTag {self.tag_id} - {self.file_id}>"
