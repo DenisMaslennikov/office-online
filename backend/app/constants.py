@@ -4,7 +4,6 @@ from pathlib import Path
 
 from fastapi import status
 
-
 # Регулярное выражение для проверки имени пользователя
 USERNAME_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+$")
 
@@ -40,6 +39,10 @@ COMPANY_DELETION_TIMEDELTA = timedelta(days=30)
 # Интервал по умолчанию для удаления компании.
 # TODO Написать задачу для Celery для удаления пользователя
 USER_DELETION_TIMEDELTA = timedelta(days=30)
+
+# Интервал отчистки корзины
+# TODO Написать задачу для Celery для удаления файлов из корзины
+FILE_IN_TRASH_LIFETIME_TIMEDELTA = timedelta(days=30)
 
 
 # Корневая директория проекта.

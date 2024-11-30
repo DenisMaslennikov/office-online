@@ -1,6 +1,3 @@
-import asyncio
-import pdb
-from http.client import responses
 from pprint import pprint
 from uuid import UUID
 
@@ -13,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.auth.jwt import decode_token
 from app.db.models import User
-from tests.conftest import faker
 
 
 @pytest.mark.asyncio

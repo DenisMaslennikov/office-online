@@ -1,10 +1,10 @@
 import datetime
 
-from sqlalchemy import String, SMALLINT, ForeignKey, TIMESTAMP, text
+from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db.models.mixins import UUIDPrimaryKeyMixin
 from app.db.models.base import Base
+from app.db.models.mixins import UUIDPrimaryKeyMixin
 
 
 class Company(Base, UUIDPrimaryKeyMixin):
@@ -27,4 +27,4 @@ class Company(Base, UUIDPrimaryKeyMixin):
     active: Mapped[bool] = mapped_column(comment="Компания активна", default=True, server_default=text("true"))
 
     def __repr__(self):
-        return self.name
+        return f"<Company {self.name}>"

@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import UniqueConstraint, CheckConstraint, String, ForeignKey
+from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -31,3 +31,6 @@ class Tag(Base, BigIntPrimaryKeyMixin):
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
     color: Mapped[str] = mapped_column(String(9), comment="Цвет тега")
+
+    def __repr__(self):
+        return f"<tag {self.name}>"

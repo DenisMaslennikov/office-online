@@ -1,13 +1,13 @@
 import datetime
 import uuid
 
-from sqlalchemy import UniqueConstraint, String, BIGINT, ForeignKey, TIMESTAMP, SMALLINT
+from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import LtreeType
 
 from app.constants import DEFAULT_FILE_GROUP_ICON_ID, DELETED_COMPANY_ID
 from app.db.models.base import Base
-from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
+from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
 
 class FilesGroup(Base, BigIntPrimaryKeyMixin):
@@ -30,6 +30,9 @@ class FilesGroup(Base, BigIntPrimaryKeyMixin):
     file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
     path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия групп файлов")
 
+    def __repr__(self):
+        return f"<FilesGroup {self.name}>"
+
 
 class File(Base, UUIDPrimaryKeyMixin):
     """Файлы."""
@@ -46,6 +49,9 @@ class File(Base, UUIDPrimaryKeyMixin):
     updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Время последнего обновления")
     checksum: Mapped[str] = mapped_column(String(64), comment="Чексумма файла")
 
+    def __repr__(self):
+        return f"<File {self.company_id}:{self.file_name}({self.download_file_name})>"
+
 
 class FileInGroup(Base, BigIntPrimaryKeyMixin):
     """Привязка файла к группе."""
@@ -60,6 +66,12 @@ class FileInGroup(Base, BigIntPrimaryKeyMixin):
     files_group_id: Mapped[int] = mapped_column(
         BIGINT, ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
     )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        TIMESTAMP, comment="Время добавления файла в группу", server_default=func.now()
+    )
+
+    def __repr__(self):
+        return f"<FileInGroup {self.files_group_id}:{self.file_id}>"
 
 
 class TaskAttachment(Base, BigIntPrimaryKeyMixin):
@@ -75,6 +87,9 @@ class TaskAttachment(Base, BigIntPrimaryKeyMixin):
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
     )
 
+    def __repr__(self):
+        return f"<TaskAttachment {self.task_id}:{self.file_id}>"
+
 
 class CommentAttachment(Base, BigIntPrimaryKeyMixin):
     """Файлы прикрепленные к комментариям."""
@@ -89,6 +104,9 @@ class CommentAttachment(Base, BigIntPrimaryKeyMixin):
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
     )
 
+    def __repr__(self):
+        return f"<CommentAttachment {self.task_comment_id}:{self.file_id}>"
+
 
 class MessageAttachment(Base, BigIntPrimaryKeyMixin):
     """Файлы прикрепленные к сообщениям в чате."""
@@ -102,3 +120,6 @@ class MessageAttachment(Base, BigIntPrimaryKeyMixin):
     file_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
     )
+
+    def __repr__(self):
+        return f"<MessageAttachment {self.message_id}:{self.file_id}>"

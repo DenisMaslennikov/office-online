@@ -1,25 +1,28 @@
 import uuid
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT, SMALLINT, CheckConstraint
+from sqlalchemy import BIGINT, SMALLINT, CheckConstraint, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.constants import DELETED_COMPANY_ID, DEFAULT_TASK_TYPE_ICON_ID
+from app.constants import DEFAULT_TASK_TYPE_ICON_ID, DELETED_COMPANY_ID
 from app.db.models.base import Base
 from app.db.models.mixins import (
+    BigIntPrimaryKeyMixin,
+    PermissionClassifierMixin,
     SmallIntPrimaryKeyMixin,
     UUIDPrimaryKeyMixin,
-    PermissionClassifierMixin,
-    BigIntPrimaryKeyMixin,
 )
 
 
-class Timezones(Base, SmallIntPrimaryKeyMixin):
+class Timezone(Base, SmallIntPrimaryKeyMixin):
     """Классификатор часовых поясов."""
 
     __tablename__ = "timezones"
 
     display_name: Mapped[str] = mapped_column(String(30), comment="Отображаемое имя часового пояса")
     iana_name: Mapped[str] = mapped_column(String(256), comment="Наименование IANA часового пояса")
+
+    def __repr__(self):
+        return f"<Timezone {self.iana_name}>"
 
 
 class Roles(Base, UUIDPrimaryKeyMixin):
@@ -32,6 +35,9 @@ class Roles(Base, UUIDPrimaryKeyMixin):
     company_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("companies.id"), comment="Идентификатор компании управляющей ролью"
     )
+
+    def __repr__(self):
+        return f"<Role {self.company_id} - {self.name}>"
 
 
 class GlobalPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
@@ -88,6 +94,9 @@ class TaskType(Base, BigIntPrimaryKeyMixin):
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
 
+    def __repr__(self):
+        return f"<TaskType {self.name}>"
+
 
 class Icon(Base, BigIntPrimaryKeyMixin):
     """Пополняемый классификатор для хранения ссылок на иконки."""
@@ -104,6 +113,9 @@ class Icon(Base, BigIntPrimaryKeyMixin):
         SMALLINT, ForeignKey("icons_categories.id"), comment="Идентификатор категории иконок"
     )
 
+    def __repr__(self):
+        return f"<Icon {self.company_id} - {self.file_name}>"
+
 
 class IconCategory(Base, SmallIntPrimaryKeyMixin):
     """Модель классификатора категорий иконок."""
@@ -112,6 +124,9 @@ class IconCategory(Base, SmallIntPrimaryKeyMixin):
 
     name: Mapped[str] = mapped_column(String(100), comment="Наименование категории иконок")
     description: Mapped[str] = mapped_column(comment="Описание категории иконок")
+
+    def __repr__(self):
+        return f"<IconCategory {self.name}>"
 
 
 class FileGroupType(Base, SmallIntPrimaryKeyMixin):
@@ -123,6 +138,9 @@ class FileGroupType(Base, SmallIntPrimaryKeyMixin):
     system_name: Mapped[str] = mapped_column(String(100), comment="Системное имя типа группы файлов", unique=True)
     system: Mapped[bool] = mapped_column(comment="Системная группа (нельзя менять права по умолчанию)")
     trash: Mapped[bool] = mapped_column(comment="Признак того что группа является корзиной")
+
+    def __repr__(self):
+        return f"<FileGroupType {self.system_name}>"
 
 
 class FileGroupTypeDefaultPermission(Base, SmallIntPrimaryKeyMixin):
@@ -137,3 +155,9 @@ class FileGroupTypeDefaultPermission(Base, SmallIntPrimaryKeyMixin):
     file_group_permission_id: Mapped[int] = mapped_column(
         SMALLINT, ForeignKey("file_group_permissions.id", ondelete="CASCADE"), comment="Идентификатор разрешения"
     )
+
+    def __repr__(self):
+        return (
+            f"<FileGroupTypeDefaultPermission {self.role_id}: {self.file_group_type_id} - "
+            f"{self.file_group_permission_id}>"
+        )

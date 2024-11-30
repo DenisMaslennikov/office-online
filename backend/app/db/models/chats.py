@@ -1,11 +1,11 @@
 import datetime
 import uuid
 
-from sqlalchemy import String, ForeignKey, SMALLINT, UniqueConstraint, TIMESTAMP, func, BIGINT
+from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import LtreeType
 
-from app.constants import DELETED_USER_ID, DELETED_MESSAGE_ID
+from app.constants import DELETED_MESSAGE_ID, DELETED_USER_ID
 from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
@@ -25,6 +25,9 @@ class ChannelsGroup(Base, BigIntPrimaryKeyMixin):
     system: Mapped[bool] = mapped_column(comment="Является системной")
     order: Mapped[int] = mapped_column(SMALLINT, comment="Порядок при сортировке")
 
+    def __repr__(self):
+        return f"<ChannelsGroup {self.name}>"
+
 
 class Channel(Base, UUIDPrimaryKeyMixin):
     """Каналы."""
@@ -43,6 +46,9 @@ class Channel(Base, UUIDPrimaryKeyMixin):
     order: Mapped[int] = mapped_column(SMALLINT, comment="Порядок при сортировке")
     system: Mapped[bool] = mapped_column(comment="Системный канал")
     private: Mapped[bool] = mapped_column(comment="Приватный чат")
+
+    def __repr__(self):
+        return f"<Channel {self.name}>"
 
 
 class Message(Base, BigIntPrimaryKeyMixin):
@@ -72,6 +78,9 @@ class Message(Base, BigIntPrimaryKeyMixin):
         comment="Идентификатор цитируемого сообщения",
     )
 
+    def __repr__(self):
+        return f"<Message {self.id}: {self.content}>"
+
 
 class LastReadMessageByUser(Base, BigIntPrimaryKeyMixin):
     """Модель хранящее последнее прочитанное сообщение в чате для пользователя."""
@@ -90,3 +99,6 @@ class LastReadMessageByUser(Base, BigIntPrimaryKeyMixin):
     channel_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
     )
+
+    def __repr__(self):
+        return f"<LastReadMessageByUser {self.user_id}: {self.channel_id} - {self.message_id}>"

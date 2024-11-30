@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import UniqueConstraint, String, ForeignKey, TIMESTAMP, func, SMALLINT, text, CheckConstraint
+from sqlalchemy import SMALLINT, TIMESTAMP, CheckConstraint, ForeignKey, String, UniqueConstraint, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -26,6 +26,9 @@ class Board(Base, UUIDPrimaryKeyMixin):
         TIMESTAMP, comment="Дата окончания", server_default=func.now()
     )
 
+    def __repr__(self):
+        return f"<Board {self.name}>"
+
 
 class BoardColumn(Base, UUIDPrimaryKeyMixin):
     """Модель столбца доски."""
@@ -46,6 +49,9 @@ class BoardColumn(Base, UUIDPrimaryKeyMixin):
         default=False,
         server_default=text("false"),
     )
+
+    def __repr__(self):
+        return f"<BoardColumn {self.name}>"
 
 
 class BoardTemplate(Base, UUIDPrimaryKeyMixin):
@@ -72,6 +78,9 @@ class BoardTemplate(Base, UUIDPrimaryKeyMixin):
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
 
+    def __repr__(self):
+        return f"<BoardTemplate {self.name}>"
+
 
 class BoardsTemplatesColumns(Base, UUIDPrimaryKeyMixin):
     """Модель столбцов для шаблонов досок."""
@@ -94,3 +103,6 @@ class BoardsTemplatesColumns(Base, UUIDPrimaryKeyMixin):
         default=False,
         server_default=text("false"),
     )
+
+    def __repr__(self):
+        return f"<BoardsTemplatesColumns {self.name}>"

@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
 
-from sqlalchemy import text, BIGINT, SMALLINT, String
+from sqlalchemy import BIGINT, SMALLINT, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -43,3 +43,6 @@ class PermissionClassifierMixin:
     )
     system_name: Mapped[str] = mapped_column(String(100), unique=True, comment="Системное имя разрешения")
     description: Mapped[str | None] = mapped_column(comment="Описание разрешения")
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: {self.system_name}>"

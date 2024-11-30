@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint, BIGINT
+from sqlalchemy import BIGINT, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DEFAULT_PROJECT_ICON_ID
@@ -29,3 +29,6 @@ class Project(Base, UUIDPrimaryKeyMixin):
         comment="Иконка проекта",
         default=DEFAULT_PROJECT_ICON_ID,
     )
+
+    def __repr__(self):
+        return f"<Project {self.name}>"

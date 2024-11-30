@@ -1,12 +1,12 @@
 import datetime
 import uuid
 
-from sqlalchemy import String, ForeignKey, TIMESTAMP, BIGINT, func, UniqueConstraint
+from sqlalchemy import BIGINT, TIMESTAMP, ForeignKey, Interval, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DELETED_USER_ID
 from app.db.models.base import Base
-from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
+from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
 
 class Task(Base, UUIDPrimaryKeyMixin):
@@ -32,6 +32,11 @@ class Task(Base, UUIDPrimaryKeyMixin):
     updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Обновлена")
     completed_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Выполнена")
     archived_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Архивирована")
+    # TODO подумать как лучше хранить оценку времени как строку 1d12h или как Interval
+    time_estimate: Mapped[Interval | None] = mapped_column(Interval, comment="Оценка времени выполнения")
+
+    def __repr__(self):
+        return f"<Task {self.project_id} - {self.name}>"
 
 
 class ChildTask(Base, BigIntPrimaryKeyMixin):
@@ -46,6 +51,9 @@ class ChildTask(Base, BigIntPrimaryKeyMixin):
         ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор дочерней задачи"
     )
 
+    def __repr__(self):
+        return f"<ChildTask {self.parent_task_id} - {self.child_task_id}>"
+
 
 class TaskResponsible(Base, BigIntPrimaryKeyMixin):
     """Ответственные за задачу."""
@@ -59,6 +67,9 @@ class TaskResponsible(Base, BigIntPrimaryKeyMixin):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя ответственного за задачу"
     )
+
+    def __repr__(self):
+        return f"<TaskResponsible {self.task_id} - {self.user_id}>"
 
 
 class TaskComment(Base, UUIDPrimaryKeyMixin):
@@ -81,3 +92,6 @@ class TaskComment(Base, UUIDPrimaryKeyMixin):
     updated_at: Mapped[datetime.datetime | None] = mapped_column(
         TIMESTAMP, comment="Дата и время последнего обновления комментария"
     )
+
+    def __repr__(self):
+        return f"<TaskComment {self.task_id}({self.user_id}) - {self.content}>"

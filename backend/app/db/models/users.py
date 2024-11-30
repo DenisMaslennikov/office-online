@@ -1,10 +1,10 @@
 import datetime
 
-from sqlalchemy import String, SMALLINT, ForeignKey, text, TIMESTAMP
+from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db.models.mixins import UUIDPrimaryKeyMixin
 from app.db.models.base import Base
+from app.db.models.mixins import UUIDPrimaryKeyMixin
 
 
 class User(Base, UUIDPrimaryKeyMixin):
@@ -34,4 +34,4 @@ class User(Base, UUIDPrimaryKeyMixin):
     )
 
     def __repr__(self):
-        return self.username
+        return f"<User {self.username}({self.email})>"

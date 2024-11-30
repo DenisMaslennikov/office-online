@@ -1,22 +1,20 @@
-import asyncio
-from typing import Generator, AsyncGenerator
+from typing import AsyncGenerator
 
 import alembic
 import pytest
 import pytest_asyncio
 from alembic import command
 from faker import Faker
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
-from httpx import AsyncClient, ASGITransport
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 
 from app import main_app
-from app.api.v1.auth.jwt import create_refresh_token, create_access_token
-from app.db.models import User
-from tests.constants import TEST_MIGRATIONS_HOST, TEST_APP_HOST
-from tests.functions import wait_for_port
-
-from app.db.db_helper import db_helper
+from app.api.v1.auth.jwt import create_access_token, create_refresh_token
 from app.config import settings
+from app.db.db_helper import db_helper
+from app.db.models import User
+from tests.constants import TEST_APP_HOST, TEST_MIGRATIONS_HOST
+from tests.functions import wait_for_port
 
 
 @pytest_asyncio.fixture
@@ -29,7 +27,6 @@ async def client(session_override) -> AsyncGenerator[AsyncClient, None]:
 @pytest.fixture
 def migration_database_url() -> str:
     """Урл для подключения к базе данных для теста миграций."""
-
     return (
         f"postgresql+asyncpg://"
         f"{settings.db.postgres_user}:"
@@ -43,7 +40,6 @@ def migration_database_url() -> str:
 @pytest.fixture(scope="session")
 def app_database_url() -> str:
     """Урл для подключения к базе данных для теста приложения."""
-
     return (
         f"postgresql+asyncpg://"
         f"{settings.db.postgres_user}:"
@@ -57,14 +53,12 @@ def app_database_url() -> str:
 @pytest_asyncio.fixture
 async def alembic_engine(migrations_test_container, migration_database_url) -> AsyncEngine:
     """Используется pytest-alembic."""
-
     return create_async_engine(migration_database_url)
 
 
 @pytest.fixture
 def alembic_config(migration_database_url):
     """Используется pytest-alembic, для настройки конфигурации алембика."""
-
     alembic_config = alembic.config.Config()
     alembic_config.set_main_option("sqlalchemy.url", migration_database_url)
     return alembic_config
@@ -73,14 +67,12 @@ def alembic_config(migration_database_url):
 @pytest.fixture(scope="session")
 def migrations_test_container():
     """Для тестирования миграций alembic."""
-
     wait_for_port(TEST_MIGRATIONS_HOST, settings.db.postgres_port)
 
 
 @pytest.fixture(scope="session")
 def database_test_container():
     """Для тестирования."""
-
     if not wait_for_port(TEST_APP_HOST, settings.db.postgres_port):
         pytest.exit(f"Exiting: Failed to connect to {TEST_APP_HOST} container.")
 
@@ -88,7 +80,6 @@ def database_test_container():
 @pytest.fixture(scope="session", autouse=True)
 def migrations(app_database_url, database_test_container):
     """Запуск миграций Alembic."""
-
     # Запуск миграций Alembic
     alembic_cfg = alembic.config.Config("alembic.ini")
     alembic_cfg.set_main_option("sqlalchemy.url", app_database_url)
@@ -103,7 +94,6 @@ def migrations(app_database_url, database_test_container):
 @pytest_asyncio.fixture(scope="session")
 async def engine(app_database_url, migrations) -> AsyncEngine:
     """Создает engine SQLAlchemy для взаимодействия с базой."""
-
     engine = create_async_engine(app_database_url)
     yield engine
     await engine.dispose()
@@ -112,7 +102,6 @@ async def engine(app_database_url, migrations) -> AsyncEngine:
 @pytest_asyncio.fixture
 async def db_session(engine) -> AsyncGenerator[AsyncSession, None]:
     """Создает и возвращает сессию базы данных для тестирования."""
-
     async with engine.connect() as connection:
         transaction = await connection.begin()
         session = AsyncSession(bind=connection, join_transaction_mode="create_savepoint", expire_on_commit=False)
@@ -133,7 +122,6 @@ def session_override(db_session):
 
     async def get_session_override() -> AsyncGenerator[AsyncSession, None]:
         """Функция для подмены зависимости сессии."""
-
         yield db_session
 
     # monkeypatch.setattr("app.api.v1.users.views.db_helper.get_session", get_session_override)
@@ -143,28 +131,24 @@ def session_override(db_session):
 @pytest.fixture
 def faker() -> Faker:
     """Фикстура фейкера для генерации тестовых данных."""
-
     return Faker("ru_RU")
 
 
 @pytest.fixture
 def user_one_password(faker) -> str:
     """Пароль первого пользователя."""
-
     return faker.password()
 
 
 @pytest.fixture
 def user_two_password(faker) -> str:
     """Пароль для пользователя 2."""
-
     return faker.password()
 
 
 @pytest_asyncio.fixture
 async def user_one(db_session, faker, user_one_password) -> User:
     """Фикстура пользователя для тестов."""
-
     user = User(
         email=faker.unique.email(),
         first_name=faker.first_name(),
@@ -181,7 +165,6 @@ async def user_one(db_session, faker, user_one_password) -> User:
 @pytest_asyncio.fixture
 async def user_two(db_session, faker, user_two_password) -> User:
     """Фистура другого пользователя для тестов."""
-
     user = User(
         email=faker.unique.email(),
         first_name=faker.first_name(),

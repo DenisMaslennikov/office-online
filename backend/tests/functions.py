@@ -7,9 +7,8 @@ from faker import Faker
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-
 from app.constants import COMPLETED_TASK_STATUS_ID
-from app.db.models import TaskStatus, Task
+from app.db.models import Task, TaskStatus
 
 
 def wait_for_port(host: str, port: int, timeout: int = 60):

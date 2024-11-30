@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, SMALLINT, UniqueConstraint, CheckConstraint
+from sqlalchemy import SMALLINT, CheckConstraint, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -36,6 +36,12 @@ class SubjectPermissionCompany(Base, BigIntPrimaryKeyMixin):
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
 
+    def __repr__(self):
+        return (
+            f"<SubjectPermissionCompany {self.company_id}: ({self.role_id} | {self.user_id}) - "
+            f"{self.global_permission_id}>"
+        )
+
 
 class CompanyUserRole(Base, BigIntPrimaryKeyMixin):
     """Роли пользователей в компании."""
@@ -52,6 +58,9 @@ class CompanyUserRole(Base, BigIntPrimaryKeyMixin):
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
     )
     role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли")
+
+    def __repr__(self):
+        return f"<CompanyUserRole {self.company_id}: ({self.user_id}) - {self.role_id}>"
 
 
 class SubjectPermissionProject(Base, BigIntPrimaryKeyMixin):
@@ -79,6 +88,12 @@ class SubjectPermissionProject(Base, BigIntPrimaryKeyMixin):
     project_permission_id: Mapped[int] = mapped_column(
         SMALLINT, ForeignKey("project_permissions.id", ondelete="RESTRICT", comment="Идентификатор разрешения")
     )
+
+    def __repr__(self):
+        return (
+            f"<SubjectPermissionProject {self.project_id}: ({self.role_id} | {self.user_id}) - "
+            f"{self.project_permission_id}>"
+        )
 
 
 class SubjectPermissionFileGroup(Base, BigIntPrimaryKeyMixin):
@@ -113,6 +128,12 @@ class SubjectPermissionFileGroup(Base, BigIntPrimaryKeyMixin):
         SMALLINT, ForeignKey("file_group_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )
 
+    def __repr__(self):
+        return (
+            f"<SubjectPermissionFileGroup {self.file_group_id}: ({self.role_id} | {self.user_id}) - "
+            f"{self.file_group_permission_id}>"
+        )
+
 
 class SubjectPermissionChannel(Base, BigIntPrimaryKeyMixin):
     """Права на канал чата."""
@@ -137,6 +158,12 @@ class SubjectPermissionChannel(Base, BigIntPrimaryKeyMixin):
     channel_permission_id: Mapped[int] = mapped_column(
         SMALLINT, ForeignKey("channels_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )
+
+    def __repr__(self):
+        return (
+            f"<SubjectPermissionChannel {self.channel_id}: ({self.role_id} | {self.user_id}) - "
+            f"{self.channel_permission_id}>"
+        )
 
 
 class SubjectPermissionChannelsGroup(Base, BigIntPrimaryKeyMixin):
@@ -166,3 +193,9 @@ class SubjectPermissionChannelsGroup(Base, BigIntPrimaryKeyMixin):
     channel_permission_id: Mapped[int] = mapped_column(
         SMALLINT, ForeignKey("channels_permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )
+
+    def __repr__(self):
+        return (
+            f"<SubjectPermissionChannelsGroup {self.channels_group_id}: ({self.role_id} | {self.user_id}) - "
+            f"{self.channel_permission_id}>"
+        )
