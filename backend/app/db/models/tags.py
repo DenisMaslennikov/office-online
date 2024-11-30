@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint
+from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint, BIGINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -34,3 +34,18 @@ class Tag(Base, BigIntPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<tag {self.name}>"
+
+
+class TaskTag(Base, BigIntPrimaryKeyMixin):
+    """Теги на задачах."""
+
+    __tablename__ = "tasks_tags"
+    __table_args__ = {"constraints": (UniqueConstraint("tag_id", "task_id", name="uq_task_tag"),)}
+
+    tag_id: Mapped[int] = mapped_column(BIGINT, ForeignKey("tags.id", ondelete="CASCADE"), comment="Идентификатор тега")
+    task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
+    )
+
+    def __repr__(self):
+        return f"<TaskTag {self.task_id} - {self.tag_id}>"
