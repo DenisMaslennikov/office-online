@@ -11,5 +11,6 @@ class Base:
     def __table_args__(cls):
         if "__table_args__" not in cls.__dict__:
             cls.__table_args__ = {}
-        cls.__table_args__["comment"] = cls.__doc__
+        if isinstance(cls.__table_args__, dict):
+            cls.__table_args__["comment"] = cls.__doc__
         return cls.__table_args__

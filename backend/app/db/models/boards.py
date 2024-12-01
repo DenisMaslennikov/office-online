@@ -12,7 +12,10 @@ class Board(Base, UUIDPrimaryKeyMixin):
     """Модель доски для учета задач."""
 
     __tablename__ = "boards"
-    __table_args__ = {"constraints": (UniqueConstraint("project_id", "name", name="uq_board_name"),)}
+    __table_args__ = (
+        UniqueConstraint("project_id", "name", name="uq_board_name"),
+        {"comment": "Модель доски для учета задач."},
+    )
 
     name: Mapped[str] = mapped_column(String(255), comment="Имя доски")
     description: Mapped[str | None] = mapped_column(comment="Описание доски")
@@ -34,7 +37,10 @@ class BoardColumn(Base, UUIDPrimaryKeyMixin):
     """Модель столбца доски."""
 
     __tablename__ = "boards_columns"
-    __table_args__ = {"constraints": (UniqueConstraint("board_id", "name", name="uq_column_name"),)}
+    __table_args__ = (
+        UniqueConstraint("board_id", "name", name="uq_column_name"),
+        {"comment": "Таблица столбца доски"},
+    )
 
     name: Mapped[str] = mapped_column(String(100), comment="Имя столбца")
     description: Mapped[str | None] = mapped_column(comment="Описание столбца")
@@ -55,19 +61,18 @@ class BoardColumn(Base, UUIDPrimaryKeyMixin):
 
 
 class BoardTemplate(Base, UUIDPrimaryKeyMixin):
-    """Модель доски для учета задач."""
+    """Модель шаблона доски."""
 
     __tablename__ = "boards_templates"
-    __table_args__ = {
-        "constraints": (
-            UniqueConstraint("project_id", "name", name="uq_board_template_name_for_project"),
-            UniqueConstraint("company_id", "name", name="uq_board_template_name_for_company"),
-            CheckConstraint(
-                "(company_id IS NOT NULL AND project_id IS NULL) OR (company_id IS NULL AND project_id IS NOT NULL)",
-                name="chk_company_or_project",
-            ),
-        )
-    }
+    __table_args__ = (
+        UniqueConstraint("project_id", "name", name="uq_board_template_name_for_project"),
+        UniqueConstraint("company_id", "name", name="uq_board_template_name_for_company"),
+        CheckConstraint(
+            "(company_id IS NOT NULL AND project_id IS NULL) OR (company_id IS NULL AND project_id IS NOT NULL)",
+            name="chk_company_or_project",
+        ),
+        {"comment": "Таблица шаблонов досок"},
+    )
 
     name: Mapped[str] = mapped_column(String(255), comment="Имя шаблона доски")
     description: Mapped[str | None] = mapped_column(comment="Описание доски")
@@ -86,7 +91,10 @@ class BoardsTemplatesColumns(Base, UUIDPrimaryKeyMixin):
     """Модель столбцов для шаблонов досок."""
 
     __tablename__ = "boards_templates_columns"
-    __table_args__ = {"constraints": (UniqueConstraint("board_template_id", "name", name="uq_board_templates_name"),)}
+    __table_args__ = (
+        UniqueConstraint("board_template_id", "name", name="uq_board_templates_name"),
+        {"comment": "Таблица столбцов для шаблонов досок"},
+    )
 
     board_template_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("boards_templates.id", ondelete="CASCADE"), comment="Идентификатор шаблона доски"

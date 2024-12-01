@@ -46,9 +46,10 @@ class CompanyUserRole(Base, BigIntPrimaryKeyMixin):
     """Роли пользователей в компании."""
 
     __tablename__ = "company_users_roles"
-    __table_args__ = {
-        "constraints": (UniqueConstraint("company_id", "user_id", "role_id", name="uq_company_user_role"),)
-    }
+    __table_args__ = (
+        UniqueConstraint("company_id", "user_id", "role_id", name="uq_company_user_role"),
+        {"comment": "Роли пользователей в компании"},
+    )
 
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
@@ -56,7 +57,10 @@ class CompanyUserRole(Base, BigIntPrimaryKeyMixin):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
     )
-    role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли")
+    role_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("roles.id", ondelete="CASCADE"),
+        comment="Идентификатор роли",
+    )
 
     def __repr__(self):
         return f"<CompanyUserRole {self.company_id}: ({self.user_id}) - {self.role_id}>"
@@ -205,11 +209,10 @@ class SubjectPermissionToObject(Base, BigIntPrimaryKeyMixin):
 
     __tablename__ = "subject_permissions_to_object"
 
-    __table_args__ = {
-        "constraints": (
-            UniqueConstraint("permission_id", "subject_id", "object_id", name="uq_subject_permission_to_object"),
-        )
-    }
+    __table_args__ = (
+        UniqueConstraint("permission_id", "subject_id", "object_id", name="uq_subject_permission_to_object"),
+        {"comment": "Права субъекта на объект"},
+    )
 
     subject_id: Mapped[uuid.UUID] = mapped_column(comment="Идентификатор субъекта (роли или пользователя)")
     subject_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа субъекта")

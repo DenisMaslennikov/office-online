@@ -12,12 +12,11 @@ class Project(Base, UUIDPrimaryKeyMixin):
     """Модель проекта."""
 
     __tablename__ = "projects"
-    __table_args__ = {
-        "constraints": (
-            UniqueConstraint("name", "company_id", name="uq_project_name"),
-            UniqueConstraint("prefix", "company_id", name="uq_project_prefix"),
-        )
-    }
+    __table_args__ = (
+        UniqueConstraint("name", "company_id", name="uq_project_name"),
+        UniqueConstraint("prefix", "company_id", name="uq_project_prefix"),
+        {"comment": "Таблица проектов"},
+    )
 
     name: Mapped[str] = mapped_column(String(255), comment="Название проекта")
     prefix: Mapped[str] = mapped_column(String(50), comment="Префикс проекта")

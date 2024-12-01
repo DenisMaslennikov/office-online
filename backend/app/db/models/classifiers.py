@@ -28,7 +28,10 @@ class Role(Base, UUIDPrimaryKeyMixin):
     """Пополняемый классификатор ролей."""
 
     __tablename__ = "roles"
-    __table_args__ = {"constraints": (UniqueConstraint("company_id", "name", name="uq_role_company"),)}
+    __table_args__ = (
+        UniqueConstraint("company_id", "name", name="uq_role_company"),
+        {"comment": "Классификатор ролей"},
+    )
 
     name: Mapped[str] = mapped_column(String(30), comment="Название роли")
     company_id: Mapped[uuid.UUID | None] = mapped_column(
@@ -67,16 +70,15 @@ class TaskType(Base, BigIntPrimaryKeyMixin):
     """Пополняемый классификатор типов задач."""
 
     __tablename__ = "task_types"
-    __table_args__ = {
-        "constraints": (
-            UniqueConstraint("name", "company_id", name="uq_task_type_name_for_company"),
-            UniqueConstraint("name", "project_id", name="uq_task_type_name_for_project"),
-            CheckConstraint(
-                "(company_id IS NOT NULL AND project_id IS NULL) OR (company_id IS NULL AND project_id IS NOT NULL)",
-                name="chk_company_or_project",
-            ),
+    __table_args__ = (
+        UniqueConstraint("name", "company_id", name="uq_task_type_name_for_company"),
+        UniqueConstraint("name", "project_id", name="uq_task_type_name_for_project"),
+        CheckConstraint(
+            "(company_id IS NOT NULL AND project_id IS NULL) OR (company_id IS NULL AND project_id IS NOT NULL)",
+            name="chk_company_or_project",
         ),
-    }
+        {"comment": "Пополняемый классификатор типов задач"},
+    )
 
     name: Mapped[str] = mapped_column(String(100), comment="Наименование типа задачи")
     description: Mapped[str] = mapped_column(comment="Описание типа задачи")
@@ -143,24 +145,24 @@ class IconCategory(Base, SmallIntPrimaryKeyMixin):
 #         return f"<FileGroupType {self.system_name}>"
 
 
-class FileGroupTypeDefaultPermission(Base, SmallIntPrimaryKeyMixin):
-    """Настройки прав по умолчанию для типов групп файлов."""
-
-    __tablename__ = "file_group_type_default_permissions"
-
-    role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли")
-    file_group_type_id: Mapped[int] = mapped_column(
-        SMALLINT, ForeignKey("file_group_types.id", ondelete="CASCADE"), comment="Идентификатор типа группы файлов"
-    )
-    file_group_permission_id: Mapped[int] = mapped_column(
-        SMALLINT, ForeignKey("file_group_permissions.id", ondelete="CASCADE"), comment="Идентификатор разрешения"
-    )
-
-    def __repr__(self):
-        return (
-            f"<FileGroupTypeDefaultPermission {self.role_id}: {self.file_group_type_id} - "
-            f"{self.file_group_permission_id}>"
-        )
+# class FileGroupTypeDefaultPermission(Base, SmallIntPrimaryKeyMixin):
+#     """Настройки прав по умолчанию для типов групп файлов."""
+#
+#     __tablename__ = "file_group_type_default_permissions"
+#
+#     role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли")
+#     file_group_type_id: Mapped[int] = mapped_column(
+#         SMALLINT, ForeignKey("file_group_types.id", ondelete="CASCADE"), comment="Идентификатор типа группы файлов"
+#     )
+#     file_group_permission_id: Mapped[int] = mapped_column(
+#         SMALLINT, ForeignKey("file_group_permissions.id", ondelete="CASCADE"), comment="Идентификатор разрешения"
+#     )
+#
+#     def __repr__(self):
+#         return (
+#             f"<FileGroupTypeDefaultPermission {self.role_id}: {self.file_group_type_id} - "
+#             f"{self.file_group_permission_id}>"
+#         )
 
 
 class EventType(Base, SmallIntPrimaryKeyMixin):
@@ -203,9 +205,10 @@ class Permission(Base, SmallIntPrimaryKeyMixin):
     """Классификатор возможных прав."""
 
     __tablename__ = "permissions"
-    __table_args__ = {
-        "constraints": (UniqueConstraint("display_name", "context_type_id", name="uq_display_name_context_type"),),
-    }
+    __table_args__ = (
+        UniqueConstraint("display_name", "context_type_id", name="uq_display_name_context_type"),
+        {"comment": "Классификатор возможных прав"},
+    )
 
     context_type_id: Mapped[int] = mapped_column(
         SMALLINT, ForeignKey("context_types.id", ondelete="RESTRICT"), comment="Идентификатор типа контекста"

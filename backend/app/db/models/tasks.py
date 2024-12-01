@@ -13,7 +13,10 @@ class Task(Base, UUIDPrimaryKeyMixin):
     """Модель задачи."""
 
     __tablename__ = "tasks"
-    __table_args__ = {"constraints": (UniqueConstraint("project_id", "name", name="uq_task_name"),)}
+    __table_args__ = (
+        UniqueConstraint("project_id", "name", name="uq_task_name"),
+        {"comment": "Задача"},
+    )
 
     name: Mapped[str] = mapped_column(String(255), comment="Название задачи")
     description: Mapped[str] = mapped_column(comment="Описание задачи")
@@ -59,7 +62,10 @@ class TaskResponsible(Base, BigIntPrimaryKeyMixin):
     """Ответственные за задачу."""
 
     __tablename__ = "task_responsibles"
-    __table_args__ = {"constraints": (UniqueConstraint("user_id", "task_id", name="uq_task_responsible"),)}
+    __table_args__ = (
+        UniqueConstraint("user_id", "task_id", name="uq_task_responsible"),
+        {"comment": "Ответственные за задачу"},
+    )
 
     task_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"

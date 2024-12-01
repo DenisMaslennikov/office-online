@@ -39,10 +39,13 @@ class User(Base, UUIDPrimaryKeyMixin):
 
 
 class UserCompanyMembership(Base, BigIntPrimaryKeyMixin):
-    """Членство пользователя в компании."""
+    """Членство пользователя в организации."""
 
     __tablename__ = "user_company_membership"
-    __table_args__ = {"constraints": (UniqueConstraint("user_id", "company_id", name="uq_user_company"),)}
+    __table_args__ = (
+        UniqueConstraint("user_id", "company_id", name="uq_user_company"),
+        {"comment": "Членство пользователя в организации"},
+    )
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"

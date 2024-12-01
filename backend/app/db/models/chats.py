@@ -13,7 +13,10 @@ class ChannelsGroup(Base, UUIDPrimaryKeyMixin):
     """Группы каналов."""
 
     __tablename__ = "channels_groups"
-    __table_args__ = {"constraints": (UniqueConstraint("name", "company_id", name="uq_channels_group_name"),)}
+    __table_args__ = (
+        UniqueConstraint("name", "company_id", name="uq_channels_group_name"),
+        {"comment": "Группы каналов"},
+    )
 
     name: Mapped[str] = mapped_column(String(30), comment="Имя группы")
     description: Mapped[str] = mapped_column(comment="Описание группы")
@@ -38,7 +41,10 @@ class Channel(Base, UUIDPrimaryKeyMixin):
     """Каналы."""
 
     __tablename__ = "channels"
-    __table_args__ = {"constraints": (UniqueConstraint("name", "company_id", name="uq_channel_name"),)}
+    __table_args__ = (
+        UniqueConstraint("name", "company_id", name="uq_channel_name"),
+        {"comment": "Каналы"},
+    )
 
     name: Mapped[str | None] = mapped_column(String(30), comment="Название канала")
     description: Mapped[str] = mapped_column(comment="Описание канала")
@@ -92,12 +98,13 @@ class Message(Base, BigIntPrimaryKeyMixin):
 
 
 class LastReadMessageByUser(Base, BigIntPrimaryKeyMixin):
-    """Модель хранящее последнее прочитанное сообщение в чате для пользователя."""
+    """Модель хранящая последнее прочитанное сообщение в чате для пользователя."""
 
     __tablename__ = "last_read_message_by_user"
-    __table_args__ = {
-        "constraints": (UniqueConstraint("user_id", "channel_id", name="uq_last_read_message_by_user_chanel"),)
-    }
+    __table_args__ = (
+        UniqueConstraint("user_id", "channel_id", name="uq_last_read_message_by_user_chanel"),
+        {"comment": "Таблица хранящая последнее прочитанное сообщение в чате для пользователя."},
+    )
 
     message_id: Mapped[int] = mapped_column(
         BIGINT, ForeignKey("messages.id", ondelete="CASCADE"), comment="Идентификатор сообщения"
