@@ -10,7 +10,7 @@ from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
 
-class ChannelsGroup(Base, BigIntPrimaryKeyMixin):
+class ChannelsGroup(Base, UUIDPrimaryKeyMixin):
     """Группы каналов."""
 
     __tablename__ = "channels_groups"
@@ -18,7 +18,10 @@ class ChannelsGroup(Base, BigIntPrimaryKeyMixin):
 
     name: Mapped[str] = mapped_column(String(30), comment="Имя группы")
     description: Mapped[str] = mapped_column(comment="Описание группы")
-    path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия группы")
+    # path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия группы")
+    parent_channel_group_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("channels_groups.id", ondelete="CASCADE"), comment="Родительская группа каналов"
+    )
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
@@ -37,8 +40,8 @@ class Channel(Base, UUIDPrimaryKeyMixin):
 
     name: Mapped[str | None] = mapped_column(String(30), comment="Название канала")
     description: Mapped[str] = mapped_column(comment="Описание канала")
-    chanel_group_id: Mapped[int] = mapped_column(
-        BIGINT, ForeignKey("channels_groups.id", ondelete="CASCADE"), comment="Идентификатор группы каналов"
+    channel_group_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("channels_groups.id", ondelete="CASCADE"), comment="Идентификатор группы каналов"
     )
     company_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор компании"
