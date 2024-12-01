@@ -161,3 +161,12 @@ class FileGroupTypeDefaultPermission(Base, SmallIntPrimaryKeyMixin):
             f"<FileGroupTypeDefaultPermission {self.role_id}: {self.file_group_type_id} - "
             f"{self.file_group_permission_id}>"
         )
+
+
+class EventType(Base, SmallIntPrimaryKeyMixin):
+    """Классификатор событий для записи в логе."""
+
+    __tablename__ = "event_types"
+
+    system_name: Mapped[str] = mapped_column(String(20), unique=True, comment="Системное название события")
+    event_display_string: Mapped[str] = mapped_column(String(255), comment="Строка для вывода события")
