@@ -32,7 +32,7 @@ class FilesGroup(Base, UUIDPrimaryKeyMixin):
         ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Родительская группа файлов"
     )
     permissions_parent_file_group_id: Mapped[uuid.UUID | None] = mapped_column(
-        ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Родительская группа прав на группу файлов"
+        ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Группа файлов от которой наследуются права"
     )
 
     def __repr__(self):
