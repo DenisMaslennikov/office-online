@@ -170,3 +170,12 @@ class EventType(Base, SmallIntPrimaryKeyMixin):
 
     system_name: Mapped[str] = mapped_column(String(20), unique=True, comment="Системное название события")
     event_display_string: Mapped[str] = mapped_column(String(255), comment="Строка для вывода события")
+
+
+class ContextType(Base, SmallIntPrimaryKeyMixin):
+    """Классификатор типа контекста."""
+
+    __tablename__ = "context_types"
+
+    system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя контекста")
+    display_name: Mapped[str] = mapped_column(String(20), comment="Имя контекста для отображения пользователю")
