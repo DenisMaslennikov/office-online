@@ -137,7 +137,7 @@ class MessageAttachment(Base, BigIntPrimaryKeyMixin):
     )
 
     message_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("message.id", ondelete="CASCADE"), comment="Идентификатор сообщения"
+        ForeignKey("messages.id", ondelete="CASCADE"), comment="Идентификатор сообщения"
     )
     file_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
