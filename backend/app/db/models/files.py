@@ -110,7 +110,7 @@ class TaskAttachment(Base, BigIntPrimaryKeyMixin):
 class CommentAttachment(Base, BigIntPrimaryKeyMixin):
     """Файлы прикрепленные к комментариям."""
 
-    __tablename__ = "task_attachments"
+    __tablename__ = "comment_attachments"
     __table_args__ = (
         UniqueConstraint("task_comment_id", "file_id", name="uq_comment_attachment"),
         {"comment": "Файлы прикрепленные к комментариям"},
@@ -130,7 +130,7 @@ class CommentAttachment(Base, BigIntPrimaryKeyMixin):
 class MessageAttachment(Base, BigIntPrimaryKeyMixin):
     """Файлы прикрепленные к сообщениям в чате."""
 
-    __tablename__ = "task_attachments"
+    __tablename__ = "message_attachments"
     __table_args__ = (
         UniqueConstraint("message_id", "file_id", name="uq_message_attachment"),
         {"comment": "Файлы прикрепленные к сообщению в чате"},
