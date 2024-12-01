@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy import ForeignKey, UniqueConstraint, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
@@ -198,3 +198,22 @@ class CompanyUserRole(Base, BigIntPrimaryKeyMixin):
 #             f"<SubjectPermissionChannelsGroup {self.channels_group_id}: ({self.role_id} | {self.user_id}) - "
 #             f"{self.channel_permission_id}>"
 #         )
+
+
+class SubjectPermissionToObject(Base, BigIntPrimaryKeyMixin):
+    """Права субъекта на объект."""
+
+    __tablename__ = "subject_permissions_to_object"
+
+    __table_args__ = {
+        "constraints": (
+            UniqueConstraint("permission_id", "subject_id", "object_id", name="uq_subject_permission_to_object"),
+        )
+    }
+
+    subject_id: Mapped[uuid.UUID] = mapped_column(comment="Идентификатор субъекта (роли или пользователя)")
+    subject_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа субъекта")
+    permission_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
+    )
+    object_id: Mapped[uuid.UUID] = mapped_column(comment="Идентификатор объекта на который действует разрешение")
