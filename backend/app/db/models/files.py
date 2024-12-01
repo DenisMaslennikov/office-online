@@ -28,8 +28,11 @@ class FilesGroup(Base, UUIDPrimaryKeyMixin):
     )
     file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
     # path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия групп файлов")
-    parent_file_group_id: Mapped[uuid.UUID] = mapped_column(
+    parent_file_group_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Родительская группа файлов"
+    )
+    permissions_parent_file_group_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Родительская группа прав на группу файлов"
     )
 
     def __repr__(self):
