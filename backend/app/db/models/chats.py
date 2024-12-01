@@ -3,7 +3,6 @@ import uuid
 
 from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy_utils import LtreeType
 
 from app.constants import DELETED_MESSAGE_ID, DELETED_USER_ID
 from app.db.models.base import Base
