@@ -24,7 +24,7 @@ class Timezone(Base, SmallIntPrimaryKeyMixin):
         return f"<Timezone {self.iana_name}>"
 
 
-class Roles(Base, UUIDPrimaryKeyMixin):
+class Role(Base, UUIDPrimaryKeyMixin):
     """Пополняемый классификатор ролей."""
 
     __tablename__ = "roles"
