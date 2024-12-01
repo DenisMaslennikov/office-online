@@ -21,6 +21,9 @@ class ChannelsGroup(Base, UUIDPrimaryKeyMixin):
     parent_channel_group_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("channels_groups.id", ondelete="CASCADE"), comment="Родительская группа каналов"
     )
+    permissions_parent_channel_group_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("channels_groups.id", ondelete="CASCADE"), comment="Группа каналов от которой наследуются права"
+    )
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
