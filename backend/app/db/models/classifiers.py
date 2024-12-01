@@ -128,18 +128,19 @@ class IconCategory(Base, SmallIntPrimaryKeyMixin):
         return f"<IconCategory {self.name}>"
 
 
-class FileGroupType(Base, SmallIntPrimaryKeyMixin):
-    """Классификатор типов групп."""
-
-    __tablename__ = "file_group_types"
-
-    display_name: Mapped[str] = mapped_column(String(100), comment="Наименование группы файлов", unique=True)
-    system_name: Mapped[str] = mapped_column(String(100), comment="Системное имя типа группы файлов", unique=True)
-    system: Mapped[bool] = mapped_column(comment="Системная группа (нельзя менять права по умолчанию)")
-    trash: Mapped[bool] = mapped_column(comment="Признак того что группа является корзиной")
-
-    def __repr__(self):
-        return f"<FileGroupType {self.system_name}>"
+# class FileGroupType(Base, SmallIntPrimaryKeyMixin):
+#     """Классификатор типов групп."""
+#
+#     __tablename__ = "file_group_types"
+#
+#     display_name: Mapped[str] = mapped_column(String(100), comment="Наименование группы файлов", unique=True)
+#     system_name: Mapped[str] = mapped_column(String(100), comment="Системное имя типа группы файлов", unique=True)
+#     can_change_permissions: Mapped[bool] = mapped_column(comment="Можно ли у группы менять права")
+#     can_delete: Mapped[bool] = mapped_column(comment="Можно ли удалять группу")
+#     trash: Mapped[bool] = mapped_column(comment="Признак того что группа является корзиной")
+#
+#     def __repr__(self):
+#         return f"<FileGroupType {self.system_name}>"
 
 
 class FileGroupTypeDefaultPermission(Base, SmallIntPrimaryKeyMixin):

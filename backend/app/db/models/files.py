@@ -26,7 +26,7 @@ class FilesGroup(Base, UUIDPrimaryKeyMixin):
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
-    file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
+    # file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
     # path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия групп файлов")
     parent_file_group_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Родительская группа файлов"
@@ -34,6 +34,8 @@ class FilesGroup(Base, UUIDPrimaryKeyMixin):
     permissions_parent_file_group_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Группа файлов от которой наследуются права"
     )
+    can_change_permissions: Mapped[bool] = mapped_column(comment="Можно ли у группы менять права")
+    can_delete: Mapped[bool] = mapped_column(comment="Можно ли удалять группу")
 
     def __repr__(self):
         return f"<FilesGroup {self.name}>"
