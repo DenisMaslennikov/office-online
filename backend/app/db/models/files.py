@@ -68,7 +68,7 @@ class FileInGroup(Base, BigIntPrimaryKeyMixin):
 
     __tablename__ = "files_in_groups"
     __table_args__ = (
-        UniqueConstraint("file_id", "file_group_id", name="uq_file_in_group"),
+        UniqueConstraint("file_id", "files_group_id", name="uq_file_in_group"),
         {"comment": "Привязка файла к группе"},
     )
 
