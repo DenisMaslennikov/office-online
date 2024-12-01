@@ -10,7 +10,7 @@ from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
 
-class FilesGroup(Base, BigIntPrimaryKeyMixin):
+class FilesGroup(Base, UUIDPrimaryKeyMixin):
     """Группы файлов."""
 
     __tablename__ = "files_groups"
@@ -28,7 +28,10 @@ class FilesGroup(Base, BigIntPrimaryKeyMixin):
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
     file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
-    path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия групп файлов")
+    # path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия групп файлов")
+    parent_file_group_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Родительская группа файлов"
+    )
 
     def __repr__(self):
         return f"<FilesGroup {self.name}>"
@@ -63,8 +66,8 @@ class FileInGroup(Base, BigIntPrimaryKeyMixin):
         ForeignKey("files.id", ondelete="CASCADE"), comment="Идентификатор файла"
     )
     # TODO Тригер если групп осталось 0 то помещаем в корзину
-    files_group_id: Mapped[int] = mapped_column(
-        BIGINT, ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
+    files_group_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
     )
     created_at: Mapped[datetime.datetime] = mapped_column(
         TIMESTAMP, comment="Время добавления файла в группу", server_default=func.now()
