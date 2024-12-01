@@ -217,3 +217,9 @@ class SubjectPermissionToObject(Base, BigIntPrimaryKeyMixin):
         SMALLINT, ForeignKey("permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )
     object_id: Mapped[uuid.UUID] = mapped_column(comment="Идентификатор объекта на который действует разрешение")
+
+    def __repr__(self):
+        return (
+            f"<SubjectPermissionToObject {self.subject_type_id} - {self.subject_id}: ({self.permission_id}) - "
+            f"{self.object_id}>"
+        )

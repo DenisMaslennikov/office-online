@@ -170,6 +170,9 @@ class EventType(Base, SmallIntPrimaryKeyMixin):
     system_name: Mapped[str] = mapped_column(String(20), unique=True, comment="Системное название события")
     event_display_string: Mapped[str] = mapped_column(String(255), comment="Строка для вывода события")
 
+    def __repr__(self):
+        return f"<EventType {self.system_name}>"
+
 
 class ContextType(Base, SmallIntPrimaryKeyMixin):
     """Классификатор типа контекста."""
@@ -179,6 +182,9 @@ class ContextType(Base, SmallIntPrimaryKeyMixin):
     system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя контекста")
     display_name: Mapped[str] = mapped_column(String(20), comment="Имя контекста для отображения пользователю")
 
+    def __repr__(self):
+        return f"<ContextType {self.system_name}>"
+
 
 class SubjectType(Base, SmallIntPrimaryKeyMixin):
     """Классификатор типов субъектов."""
@@ -187,6 +193,9 @@ class SubjectType(Base, SmallIntPrimaryKeyMixin):
 
     system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя типа субъекта")
     display_name: Mapped[str] = mapped_column(String(20), comment="Имя типа субъекта для отображения пользователю")
+
+    def __repr__(self):
+        return f"<SubjectType {self.system_name}>"
 
 
 class Permission(Base, SmallIntPrimaryKeyMixin):
@@ -202,3 +211,6 @@ class Permission(Base, SmallIntPrimaryKeyMixin):
     )
     system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя разрешения", unique=True)
     display_name: Mapped[str] = mapped_column(String(50), comment="Имя разрешения для пользователя")
+
+    def __repr__(self):
+        return f"<Permission {self.display_name}>"
