@@ -1,4 +1,5 @@
 import uuid
+import datetime
 
 from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
@@ -26,8 +27,8 @@ class Log(Base, BigIntPrimaryKeyMixin):
     )
     old_value: Mapped[str] = mapped_column(comment="Значение до изменения")
     new_value: Mapped[str] = mapped_column(comment="Значение после изменения")
-    created_at: Mapped[TIMESTAMP] = mapped_column(server_default=func.now())
-    context_type_id: Mapped[SMALLINT] = mapped_column(
+    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    context_type_id: Mapped[int] = mapped_column(
         ForeignKey("context_types.id", ondelete="RESTRICT"), comment="Тип контекста события"
     )
     object_id: Mapped[uuid.UUID] = mapped_column(comment="Идентификатор объекта с которым произошло событие")
