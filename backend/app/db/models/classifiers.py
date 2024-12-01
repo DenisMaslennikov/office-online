@@ -178,3 +178,12 @@ class ContextType(Base, SmallIntPrimaryKeyMixin):
 
     system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя контекста")
     display_name: Mapped[str] = mapped_column(String(20), comment="Имя контекста для отображения пользователю")
+
+
+class SubjectType(Base, SmallIntPrimaryKeyMixin):
+    """Классификатор типов субъектов."""
+
+    __tablename__ = "subject_types"
+
+    system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя типа субъекта")
+    display_name: Mapped[str] = mapped_column(String(20), comment="Имя типа субъекта для отображения пользователю")
