@@ -1,10 +1,11 @@
 import datetime
+import uuid
 
-from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, text
+from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
-from app.db.models.mixins import UUIDPrimaryKeyMixin
+from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
 
 
 class User(Base, UUIDPrimaryKeyMixin):
@@ -35,3 +36,17 @@ class User(Base, UUIDPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<User {self.username}({self.email})>"
+
+
+class UserCompanyMembership(Base, BigIntPrimaryKeyMixin):
+    """Членство пользователя в компании."""
+
+    __tablename__ = "user_company_membership"
+    __table_args__ = {"constraints": (UniqueConstraint("user_id", "company_id", name="uq_user_company"),)}
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
+    )
+    company_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
+    )
