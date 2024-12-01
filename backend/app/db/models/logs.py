@@ -8,7 +8,7 @@ from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin
 
 
-class log(Base, BigIntPrimaryKeyMixin):
+class Log(Base, BigIntPrimaryKeyMixin):
     """Модель для хранения логов приложения."""
 
     __tablename__ = "logs"
@@ -31,3 +31,9 @@ class log(Base, BigIntPrimaryKeyMixin):
         ForeignKey("context_types.id", ondelete="RESTRICT"), comment="Тип контекста события"
     )
     object_id: Mapped[uuid.UUID] = mapped_column(comment="Идентификатор объекта с которым произошло событие")
+
+    def __repr__(self):
+        return (
+            f"<Log {self.created_at}:{self.company_id}:{self.event_type_id}:{self.user_id}:{self.context_type_id}:"
+            f"{self.object_id}:{self.old_value}:{self.new_value}>"
+        )
