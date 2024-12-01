@@ -187,3 +187,18 @@ class SubjectType(Base, SmallIntPrimaryKeyMixin):
 
     system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя типа субъекта")
     display_name: Mapped[str] = mapped_column(String(20), comment="Имя типа субъекта для отображения пользователю")
+
+
+class Permission(Base, SmallIntPrimaryKeyMixin):
+    """Классификатор возможных прав."""
+
+    __tablename__ = "permissions"
+    __table_args__ = {
+        "constraints": (UniqueConstraint("display_name", "context_type_id", name="uq_display_name_context_type"),),
+    }
+
+    context_type_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("context_types.id", ondelete="RESTRICT"), comment="Идентификатор типа контекста"
+    )
+    system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя разрешения", unique=True)
+    display_name: Mapped[str] = mapped_column(String(50), comment="Имя разрешения для пользователя")
