@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DEFAULT_TASK_TYPE_ICON_ID, DELETED_COMPANY_ID
 from app.db.models.base import Base
-from app.db.models.emuns import icon_category_enum
+from app.db.models.enums import icon_category_enum
 from app.db.models.mixins import (
     BigIntPrimaryKeyMixin,
     SmallIntPrimaryKeyMixin,

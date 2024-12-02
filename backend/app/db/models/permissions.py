@@ -4,7 +4,7 @@ from sqlalchemy import ForeignKey, UniqueConstraint, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
-from app.db.models.emuns import subject_type_enum
+from app.db.models.enums import subject_type_enum
 from app.db.models.mixins import BigIntPrimaryKeyMixin
 
 # class SubjectPermissionCompany(Base, BigIntPrimaryKeyMixin):
