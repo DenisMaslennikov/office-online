@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DEFAULT_TASK_TYPE_ICON_ID, DELETED_COMPANY_ID
 from app.db.models.base import Base
+from app.db.models.emuns import icon_category_enum
 from app.db.models.mixins import (
     BigIntPrimaryKeyMixin,
     SmallIntPrimaryKeyMixin,
@@ -110,24 +111,22 @@ class Icon(Base, BigIntPrimaryKeyMixin):
         default=DELETED_COMPANY_ID,
     )
     file_name: Mapped[str] = mapped_column(comment="Имя файла", unique=True)
-    icon_category_id: Mapped[int] = mapped_column(
-        SMALLINT, ForeignKey("icons_categories.id"), comment="Идентификатор категории иконок"
-    )
+    icon_category_id: Mapped[str] = mapped_column(icon_category_enum, comment="Категория иконок")
 
     def __repr__(self):
         return f"<Icon {self.company_id} - {self.file_name}>"
 
 
-class IconCategory(Base, SmallIntPrimaryKeyMixin):
-    """Модель классификатора категорий иконок."""
-
-    __tablename__ = "icons_categories"
-
-    name: Mapped[str] = mapped_column(String(100), comment="Наименование категории иконок")
-    description: Mapped[str] = mapped_column(comment="Описание категории иконок")
-
-    def __repr__(self):
-        return f"<IconCategory {self.name}>"
+# class IconCategory(Base, SmallIntPrimaryKeyMixin):
+#     """Модель классификатора категорий иконок."""
+#
+#     __tablename__ = "icons_categories"
+#
+#     name: Mapped[str] = mapped_column(String(100), comment="Наименование категории иконок")
+#     description: Mapped[str] = mapped_column(comment="Описание категории иконок")
+#
+#     def __repr__(self):
+#         return f"<IconCategory {self.name}>"
 
 
 # class FileGroupType(Base, SmallIntPrimaryKeyMixin):
@@ -189,16 +188,16 @@ class ContextType(Base, SmallIntPrimaryKeyMixin):
         return f"<ContextType {self.system_name}>"
 
 
-class SubjectType(Base, SmallIntPrimaryKeyMixin):
-    """Классификатор типов субъектов."""
-
-    __tablename__ = "subject_types"
-
-    system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя типа субъекта")
-    display_name: Mapped[str] = mapped_column(String(20), comment="Имя типа субъекта для отображения пользователю")
-
-    def __repr__(self):
-        return f"<SubjectType {self.system_name}>"
+# class SubjectType(Base, SmallIntPrimaryKeyMixin):
+#     """Классификатор типов субъектов."""
+#
+#     __tablename__ = "subject_types"
+#
+#     system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя типа субъекта")
+#     display_name: Mapped[str] = mapped_column(String(20), comment="Имя типа субъекта для отображения пользователю")
+#
+#     def __repr__(self):
+#         return f"<SubjectType {self.system_name}>"
 
 
 class Permission(Base, SmallIntPrimaryKeyMixin):

@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey, UniqueConstraint, SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
+from app.db.models.emuns import subject_type_enum
 from app.db.models.mixins import BigIntPrimaryKeyMixin
 
 # class SubjectPermissionCompany(Base, BigIntPrimaryKeyMixin):
@@ -215,7 +216,7 @@ class SubjectPermissionToObject(Base, BigIntPrimaryKeyMixin):
     )
 
     subject_id: Mapped[uuid.UUID] = mapped_column(comment="Идентификатор субъекта (роли или пользователя)")
-    subject_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа субъекта")
+    subject_type: Mapped[str] = mapped_column(subject_type_enum, comment="Тип субъекта")
     permission_id: Mapped[int] = mapped_column(
         SMALLINT, ForeignKey("permissions.id", ondelete="RESTRICT"), comment="Идентификатор разрешения"
     )

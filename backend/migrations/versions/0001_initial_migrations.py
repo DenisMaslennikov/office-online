@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2024-12-01 19:06:24.062827
+Create Date: 2024-12-02 13:36:54.256016
 
 """
 from typing import Sequence, Union
@@ -34,20 +34,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('system_name'),
     comment='Классификатор событий для записи в логе.'
-    )
-    op.create_table('icons_categories',
-    sa.Column('name', sa.String(length=100), nullable=False, comment='Наименование категории иконок'),
-    sa.Column('description', sa.String(), nullable=False, comment='Описание категории иконок'),
-    sa.Column('id', sa.SMALLINT(), nullable=False, comment='Идентификатор'),
-    sa.PrimaryKeyConstraint('id'),
-    comment='Модель классификатора категорий иконок.'
-    )
-    op.create_table('subject_types',
-    sa.Column('system_name', sa.String(length=20), nullable=False, comment='Системное имя типа субъекта'),
-    sa.Column('display_name', sa.String(length=20), nullable=False, comment='Имя типа субъекта для отображения пользователю'),
-    sa.Column('id', sa.SMALLINT(), nullable=False, comment='Идентификатор'),
-    sa.PrimaryKeyConstraint('id'),
-    comment='Классификатор типов субъектов.'
     )
     op.create_table('timezones',
     sa.Column('display_name', sa.String(length=30), nullable=False, comment='Отображаемое имя часового пояса'),
@@ -135,10 +121,9 @@ def upgrade() -> None:
     op.create_table('icons',
     sa.Column('company_id', sa.Uuid(), nullable=True, comment='Идентификатор организации'),
     sa.Column('file_name', sa.String(), nullable=False, comment='Имя файла'),
-    sa.Column('icon_category_id', sa.SMALLINT(), nullable=False, comment='Идентификатор категории иконок'),
+    sa.Column('icon_category_id', sa.Enum('TASK_TYPE', 'FILE_GROUP', 'PROJECT', name='icon_category'), nullable=False, comment='Категория иконок'),
     sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
     sa.ForeignKeyConstraint(['company_id'], ['companies.id'], ondelete='SET DEFAULT'),
-    sa.ForeignKeyConstraint(['icon_category_id'], ['icons_categories.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('file_name'),
     comment='Пополняемый классификатор для хранения ссылок на иконки.'
@@ -171,7 +156,7 @@ def upgrade() -> None:
     )
     op.create_table('subject_permissions_to_object',
     sa.Column('subject_id', sa.Uuid(), nullable=False, comment='Идентификатор субъекта (роли или пользователя)'),
-    sa.Column('subject_type_id', sa.SMALLINT(), nullable=False, comment='Идентификатор типа субъекта'),
+    sa.Column('subject_type', sa.Enum('ROLE', 'USER', name='subject_type'), nullable=False, comment='Тип субъекта'),
     sa.Column('permission_id', sa.SMALLINT(), nullable=False, comment='Идентификатор разрешения'),
     sa.Column('object_id', sa.Uuid(), nullable=False, comment='Идентификатор объекта на который действует разрешение'),
     sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
@@ -515,8 +500,6 @@ def downgrade() -> None:
     op.drop_table('permissions')
     op.drop_table('companies')
     op.drop_table('timezones')
-    op.drop_table('subject_types')
-    op.drop_table('icons_categories')
     op.drop_table('event_types')
     op.drop_table('context_types')
     # ### end Alembic commands ###

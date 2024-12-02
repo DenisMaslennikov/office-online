@@ -6,10 +6,8 @@ from app.db.models.classifiers import (
     Role,
     TaskType,
     Icon,
-    IconCategory,
     EventType,
     ContextType,
-    SubjectType,
     Permission,
 )
 from app.db.models.companies import Company
@@ -35,10 +33,8 @@ __all__ = [
     "Role",
     "TaskType",
     "Icon",
-    "IconCategory",
     "EventType",
     "ContextType",
-    "SubjectType",
     "Permission",
     "Company",
     "FilesGroup",
