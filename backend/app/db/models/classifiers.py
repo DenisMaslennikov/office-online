@@ -228,3 +228,15 @@ class ProjectType(Base, SmallIntPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<ProjectType {self.name}>"
+
+
+class TaskLinkType(Base, SmallIntPrimaryKeyMixin):
+    """Классификатор типов связи задач."""
+
+    __tablename__ = "task_link_types"
+
+    status: Mapped[str] = mapped_column(String(30), comment="Статус")
+    invert_status: Mapped[bool] = mapped_column(String(30), comment="Обратный статус")
+
+    def __repr__(self):
+        return f"<TaskLinkType {self.status} - {self.invert_status}>"
