@@ -24,6 +24,9 @@ class Sprint(Base, BigIntPrimaryKeyMixin):
     status: Mapped[str] = mapped_column(sprint_status_enum, comment="Статус спринта", default="Планирование")
     story_points: Mapped[int | None] = mapped_column(BIGINT, comment="Стори поинты спринта")
 
+    def __repr__(self):
+        return f"<Sprint {self.name}>"
+
 
 class TasksSprint(Base, BigIntPrimaryKeyMixin):
     """Задачи спринта."""
@@ -36,3 +39,6 @@ class TasksSprint(Base, BigIntPrimaryKeyMixin):
     task_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
     )
+
+    def __repr__(self):
+        return f"<TasksSprint {self.sprint_id} - {self.task_id}>"

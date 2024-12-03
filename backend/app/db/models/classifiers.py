@@ -225,3 +225,6 @@ class ProjectType(Base, SmallIntPrimaryKeyMixin):
     __tablename__ = "project_types"
 
     name: Mapped[str] = mapped_column(String(30), comment="Название типа проекта")
+
+    def __repr__(self):
+        return f"<ProjectType {self.name}>"
