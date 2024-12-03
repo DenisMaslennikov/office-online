@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import BIGINT, TIMESTAMP, ForeignKey, Interval, String, UniqueConstraint, func
+from sqlalchemy import BIGINT, TIMESTAMP, ForeignKey, Interval, String, UniqueConstraint, func, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DELETED_USER_ID
@@ -20,6 +20,14 @@ class Task(Base, UUIDPrimaryKeyMixin):
 
     name: Mapped[str] = mapped_column(String(255), comment="Название задачи")
     description: Mapped[str] = mapped_column(comment="Описание задачи")
+    creator_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="SET DEFAULT"), default=DELETED_USER_ID, comment="Идентификатор автора задачи"
+    )
+    assignee_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET DEFAULT"),
+        default=DELETED_USER_ID,
+        comment="Идентификатор пользователя которому назначена задача",
+    )
     column_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("boards_columns.id", ondelete="RESTRICT"), comment="Идентификатор столбца"
     )
@@ -35,8 +43,13 @@ class Task(Base, UUIDPrimaryKeyMixin):
     updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Обновлена")
     completed_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Выполнена")
     archived_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Архивирована")
-    # TODO подумать как лучше хранить оценку времени как строку 1d12h или как Interval
-    time_estimate: Mapped[Interval | None] = mapped_column(Interval, comment="Оценка времени выполнения")
+    archived_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET DEFAULT"),
+        default=DELETED_USER_ID,
+        comment="Идентификатор пользователя архивировавшего задачу",
+    )
+    time_estimate: Mapped[int | None] = mapped_column(BIGINT, comment="Оценка времени выполнения")
+    story_points: Mapped[int | None] = mapped_column(BIGINT, comment="Оценка задачи в story points")
 
     def __repr__(self):
         return f"<Task {self.project_id} - {self.name}>"
@@ -58,24 +71,24 @@ class ChildTask(Base, BigIntPrimaryKeyMixin):
         return f"<ChildTask {self.parent_task_id} - {self.child_task_id}>"
 
 
-class TaskResponsible(Base, BigIntPrimaryKeyMixin):
-    """Ответственные за задачу."""
-
-    __tablename__ = "task_responsibles"
-    __table_args__ = (
-        UniqueConstraint("user_id", "task_id", name="uq_task_responsible"),
-        {"comment": "Ответственные за задачу"},
-    )
-
-    task_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
-    )
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя ответственного за задачу"
-    )
-
-    def __repr__(self):
-        return f"<TaskResponsible {self.task_id} - {self.user_id}>"
+# class TaskResponsible(Base, BigIntPrimaryKeyMixin):
+#     """Ответственные за задачу."""
+#
+#     __tablename__ = "task_responsibles"
+#     __table_args__ = (
+#         UniqueConstraint("user_id", "task_id", name="uq_task_responsible"),
+#         {"comment": "Ответственные за задачу"},
+#     )
+#
+#     task_id: Mapped[uuid.UUID] = mapped_column(
+#         ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
+#     )
+#     user_id: Mapped[uuid.UUID] = mapped_column(
+#         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя ответственного за задачу"
+#     )
+#
+#     def __repr__(self):
+#         return f"<TaskResponsible {self.task_id} - {self.user_id}>"
 
 
 class TaskComment(Base, UUIDPrimaryKeyMixin):

@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.constants import DEFAULT_FILE_GROUP_ICON_ID, DELETED_COMPANY_ID
+from app.constants import DEFAULT_FILE_GROUP_ICON_ID, DELETED_COMPANY_ID, DELETED_USER_ID
 from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
@@ -51,6 +51,9 @@ class File(Base, UUIDPrimaryKeyMixin):
 
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="SET DEFAULT"), default=DELETED_COMPANY_ID, comment="Идентификатор компании"
+    )
+    author_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="SET DEFAULT"), default=DELETED_USER_ID, comment="Идентификатор автора файла"
     )
     download_file_name: Mapped[str] = mapped_column(comment="Имя файла при скачивание")
     file_name: Mapped[str] = mapped_column(comment="Системное имя файла", unique=True)
