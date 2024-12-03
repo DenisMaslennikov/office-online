@@ -217,3 +217,11 @@ class Permission(Base, SmallIntPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<Permission {self.display_name}>"
+
+
+class ProjectType(Base, SmallIntPrimaryKeyMixin):
+    """Классификатор типов проектов."""
+
+    __tablename__ = "project_types"
+
+    name: Mapped[str] = mapped_column(String(30), comment="Название типа проекта")
