@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from sqlalchemy import BIGINT, TIMESTAMP, ForeignKey, Interval, String, UniqueConstraint, func, Integer
+from sqlalchemy.dialects.mysql import SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DELETED_USER_ID
@@ -114,3 +115,22 @@ class TaskComment(Base, UUIDPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<TaskComment {self.task_id}({self.user_id}) - {self.content}>"
+
+
+class LinkedTask(Base, BigIntPrimaryKeyMixin):
+    """Связанные задачи."""
+
+    __tablename__ = "linked_tasks"
+
+    from_task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Задача с которой стоит связь"
+    )
+    to_task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Задача на которую стоит связь"
+    )
+    task_link_type_id: Mapped[int] = mapped_column(
+        SMALLINT, ForeignKey("task_link_types.id", ondelete="RESTRICT"), comment="Тип связи"
+    )
+
+    def __repr__(self):
+        return f"<LinkedTask {self.from_task_id} - {self.to_task_id} ({self.task_link_type_id})>"
