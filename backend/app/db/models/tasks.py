@@ -134,3 +134,17 @@ class LinkedTask(Base, BigIntPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<LinkedTask {self.from_task_id} - {self.to_task_id} ({self.task_link_type_id})>"
+
+
+class TaskTimeSpend(Base, BigIntPrimaryKeyMixin):
+    """Учет времени потраченного на задачу"""
+
+    __tablename__ = "task_time_spend"
+    description: Mapped[str] = mapped_column(comment="Описание")
+    task_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
+    )
+    time_spend: Mapped[int] = mapped_column(BIGINT, comment="Потраченое время в минутах")
+
+    def __repr__(self):
+        return f"<TaskTimeSpend {self.task_id} - {self.time_spend} ({self.description})>"
