@@ -22,12 +22,8 @@ class Board(Base, UUIDPrimaryKeyMixin):
     project_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), comment="идентификатор проекта"
     )
-    start_time: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Дата начала")
-    end_time: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Дата окончания")
     archived_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Дата архивации")
-    created_at: Mapped[datetime.datetime] = mapped_column(
-        TIMESTAMP, comment="Дата окончания", server_default=func.now()
-    )
+    created_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP, comment="Дата создания", server_default=func.now())
 
     def __repr__(self):
         return f"<Board {self.name}>"
