@@ -1,15 +1,15 @@
-"""initial_migrations
+"""initial_migration
 
 Revision ID: 0001
 Revises: 
-Create Date: 2024-12-02 13:36:54.256016
+Create Date: 2024-12-03 15:59:04.591556
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision: str = '0001'
@@ -34,6 +34,19 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('system_name'),
     comment='Классификатор событий для записи в логе.'
+    )
+    op.create_table('project_types',
+    sa.Column('name', sa.String(length=30), nullable=False, comment='Название типа проекта'),
+    sa.Column('id', sa.SMALLINT(), nullable=False, comment='Идентификатор'),
+    sa.PrimaryKeyConstraint('id'),
+    comment='Классификатор типов проектов.'
+    )
+    op.create_table('task_link_types',
+    sa.Column('status', sa.String(length=30), nullable=False, comment='Статус'),
+    sa.Column('invert_status', sa.String(length=30), nullable=False, comment='Обратный статус'),
+    sa.Column('id', sa.SMALLINT(), nullable=False, comment='Идентификатор'),
+    sa.PrimaryKeyConstraint('id'),
+    comment='Классификатор типов связи задач.'
     )
     op.create_table('timezones',
     sa.Column('display_name', sa.String(length=30), nullable=False, comment='Отображаемое имя часового пояса'),
@@ -72,9 +85,7 @@ def upgrade() -> None:
     sa.Column('username', sa.String(length=30), nullable=False, comment='Имя пользователя'),
     sa.Column('hashed_password', sa.String(), nullable=False, comment='Хеш пароля'),
     sa.Column('phone', sa.String(length=30), nullable=False, comment='Номер телефона'),
-    sa.Column('first_name', sa.String(length=30), nullable=True, comment='Имя'),
-    sa.Column('second_name', sa.String(length=30), nullable=True, comment='Фамилия'),
-    sa.Column('middle_name', sa.String(length=30), nullable=True, comment='Отчество'),
+    sa.Column('display_name', sa.String(length=60), nullable=False, comment='Имя для отображения'),
     sa.Column('image', sa.String(), nullable=True, comment='Путь к файлу изображения пользователя'),
     sa.Column('timezone_id', sa.SMALLINT(), nullable=True, comment='Идентификатор таймзоны'),
     sa.Column('is_bot', sa.Boolean(), server_default=sa.text('false'), nullable=False, comment='Является ли пользователь ботом'),
@@ -106,6 +117,7 @@ def upgrade() -> None:
     )
     op.create_table('files',
     sa.Column('company_id', sa.Uuid(), nullable=False, comment='Идентификатор компании'),
+    sa.Column('author_id', sa.Uuid(), nullable=False, comment='Идентификатор автора файла'),
     sa.Column('download_file_name', sa.String(), nullable=False, comment='Имя файла при скачивание'),
     sa.Column('file_name', sa.String(), nullable=False, comment='Системное имя файла'),
     sa.Column('size', sa.BIGINT(), nullable=False, comment='Размер файла'),
@@ -113,6 +125,7 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=True, comment='Время последнего обновления'),
     sa.Column('checksum', sa.String(length=64), nullable=False, comment='Чексумма файла'),
     sa.Column('id', sa.Uuid(), server_default=sa.text('gen_random_uuid()'), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['author_id'], ['users.id'], ondelete='SET DEFAULT'),
     sa.ForeignKeyConstraint(['company_id'], ['companies.id'], ondelete='SET DEFAULT'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('file_name'),
@@ -240,10 +253,8 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=255), nullable=False, comment='Имя доски'),
     sa.Column('description', sa.String(), nullable=True, comment='Описание доски'),
     sa.Column('project_id', sa.Uuid(), nullable=False, comment='идентификатор проекта'),
-    sa.Column('start_time', sa.TIMESTAMP(), nullable=True, comment='Дата начала'),
-    sa.Column('end_time', sa.TIMESTAMP(), nullable=True, comment='Дата окончания'),
     sa.Column('archived_at', sa.TIMESTAMP(), nullable=True, comment='Дата архивации'),
-    sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False, comment='Дата окончания'),
+    sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False, comment='Дата создания'),
     sa.Column('id', sa.Uuid(), server_default=sa.text('gen_random_uuid()'), nullable=False, comment='Идентификатор'),
     sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
@@ -288,6 +299,19 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='SET DEFAULT'),
     sa.PrimaryKeyConstraint('id'),
     comment='Модель сообщения.'
+    )
+    op.create_table('sprints',
+    sa.Column('name', sa.String(length=100), nullable=False, comment='Название спринта'),
+    sa.Column('description', sa.String(), nullable=False, comment='Описание/цель спринта'),
+    sa.Column('project_id', sa.Uuid(), nullable=False, comment='Идентификатор проекта'),
+    sa.Column('start_date', sa.TIMESTAMP(), nullable=True, comment='Время начала спринта'),
+    sa.Column('end_date', sa.TIMESTAMP(), nullable=True, comment='Время завершения спринта'),
+    sa.Column('status', sa.Enum('Планирование', 'Активный', 'Завершенный', name='sprint_status'), nullable=False, comment='Статус спринта'),
+    sa.Column('story_points', sa.BIGINT(), nullable=True, comment='Стори поинты спринта'),
+    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    comment='Модель спринта.'
     )
     op.create_table('tags',
     sa.Column('name', sa.String(length=30), nullable=False, comment='Название тега'),
@@ -383,6 +407,8 @@ def upgrade() -> None:
     op.create_table('tasks',
     sa.Column('name', sa.String(length=255), nullable=False, comment='Название задачи'),
     sa.Column('description', sa.String(), nullable=False, comment='Описание задачи'),
+    sa.Column('creator_id', sa.Uuid(), nullable=False, comment='Идентификатор автора задачи'),
+    sa.Column('assignee_id', sa.Uuid(), nullable=True, comment='Идентификатор пользователя которому назначена задача'),
     sa.Column('column_id', sa.Uuid(), nullable=True, comment='Идентификатор столбца'),
     sa.Column('project_id', sa.Uuid(), nullable=False, comment='Идентификатор проекта'),
     sa.Column('color', sa.String(length=9), nullable=False, comment='Цвет задачи'),
@@ -392,9 +418,14 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=True, comment='Обновлена'),
     sa.Column('completed_at', sa.TIMESTAMP(), nullable=True, comment='Выполнена'),
     sa.Column('archived_at', sa.TIMESTAMP(), nullable=True, comment='Архивирована'),
-    sa.Column('time_estimate', sa.Interval(), nullable=True, comment='Оценка времени выполнения'),
+    sa.Column('archived_by_id', sa.Uuid(), nullable=True, comment='Идентификатор пользователя архивировавшего задачу'),
+    sa.Column('time_estimate', sa.BIGINT(), nullable=True, comment='Оценка времени выполнения'),
+    sa.Column('story_points', sa.BIGINT(), nullable=True, comment='Оценка задачи в story points'),
     sa.Column('id', sa.Uuid(), server_default=sa.text('gen_random_uuid()'), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['archived_by_id'], ['users.id'], ondelete='SET DEFAULT'),
+    sa.ForeignKeyConstraint(['assignee_id'], ['users.id'], ondelete='SET DEFAULT'),
     sa.ForeignKeyConstraint(['column_id'], ['boards_columns.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['creator_id'], ['users.id'], ondelete='SET DEFAULT'),
     sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['task_type_id'], ['task_types.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
@@ -409,6 +440,17 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['parent_task_id'], ['tasks.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     comment='Дочерние задачи.'
+    )
+    op.create_table('linked_tasks',
+    sa.Column('from_task_id', sa.Uuid(), nullable=False, comment='Задача с которой стоит связь'),
+    sa.Column('to_task_id', sa.Uuid(), nullable=False, comment='Задача на которую стоит связь'),
+    sa.Column('task_link_type_id', mysql.SMALLINT(), nullable=False, comment='Тип связи'),
+    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['from_task_id'], ['tasks.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['task_link_type_id'], ['task_link_types.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['to_task_id'], ['tasks.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    comment='Связанные задачи.'
     )
     op.create_table('task_attachments',
     sa.Column('task_id', sa.Uuid(), nullable=False, comment='Идентификатор задачи'),
@@ -432,15 +474,23 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     comment='Модель комментария к задаче.'
     )
-    op.create_table('task_responsibles',
+    op.create_table('task_time_spend',
+    sa.Column('description', sa.String(), nullable=False, comment='Описание'),
     sa.Column('task_id', sa.Uuid(), nullable=False, comment='Идентификатор задачи'),
-    sa.Column('user_id', sa.Uuid(), nullable=False, comment='Идентификатор пользователя ответственного за задачу'),
+    sa.Column('time_spend', sa.BIGINT(), nullable=False, comment='Потраченое время в минутах'),
     sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
     sa.ForeignKeyConstraint(['task_id'], ['tasks.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_id', 'task_id', name='uq_task_responsible'),
-    comment='Ответственные за задачу'
+    comment='Учет времени потраченного на задачу'
+    )
+    op.create_table('tasks_sprints',
+    sa.Column('sprint_id', sa.BIGINT(), nullable=False, comment='Идентификатор спринта'),
+    sa.Column('task_id', sa.Uuid(), nullable=False, comment='Идентификатор задачи'),
+    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['sprint_id'], ['sprints.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['task_id'], ['tasks.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    comment='Задачи спринта.'
     )
     op.create_table('tasks_tags',
     sa.Column('tag_id', sa.BIGINT(), nullable=False, comment='Идентификатор тега'),
@@ -469,9 +519,11 @@ def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('comment_attachments')
     op.drop_table('tasks_tags')
-    op.drop_table('task_responsibles')
+    op.drop_table('tasks_sprints')
+    op.drop_table('task_time_spend')
     op.drop_table('task_comments')
     op.drop_table('task_attachments')
+    op.drop_table('linked_tasks')
     op.drop_table('child_tasks')
     op.drop_table('tasks')
     op.drop_table('message_attachments')
@@ -481,6 +533,7 @@ def downgrade() -> None:
     op.drop_table('boards_columns')
     op.drop_table('task_types')
     op.drop_table('tags')
+    op.drop_table('sprints')
     op.drop_table('messages')
     op.drop_table('files_in_groups')
     op.drop_table('boards_templates')
@@ -500,6 +553,8 @@ def downgrade() -> None:
     op.drop_table('permissions')
     op.drop_table('companies')
     op.drop_table('timezones')
+    op.drop_table('task_link_types')
+    op.drop_table('project_types')
     op.drop_table('event_types')
     op.drop_table('context_types')
     # ### end Alembic commands ###
