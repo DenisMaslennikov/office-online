@@ -63,8 +63,6 @@ class Settings(BaseSettings):
 
     # Настройки подключения к базе данных
     db: DataBaseSettings
-    # Корневая директория проекта
-    # base_dir: Path = Path(__file__).resolve().parent.parent
     # Надо ли отслеживать изменения в файлах и перезапускать uvicorn
     reload: bool = True
     debug: bool
