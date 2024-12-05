@@ -141,18 +141,6 @@ class ContextType(Base, SmallIntPrimaryKeyMixin):
         return f"<ContextType {self.system_name}>"
 
 
-# class SubjectType(Base, SmallIntPrimaryKeyMixin):
-#     """Классификатор типов субъектов."""
-#
-#     __tablename__ = "subject_types"
-#
-#     system_name: Mapped[str] = mapped_column(String(20), comment="Системное имя типа субъекта")
-#     display_name: Mapped[str] = mapped_column(String(20), comment="Имя типа субъекта для отображения пользователю")
-#
-#     def __repr__(self):
-#         return f"<SubjectType {self.system_name}>"
-
-
 class Permission(Base, SmallIntPrimaryKeyMixin):
     """Классификатор возможных прав."""
 

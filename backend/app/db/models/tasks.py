@@ -72,26 +72,6 @@ class ChildTask(Base, BigIntPrimaryKeyMixin):
         return f"<ChildTask {self.parent_task_id} - {self.child_task_id}>"
 
 
-# class TaskResponsible(Base, BigIntPrimaryKeyMixin):
-#     """Ответственные за задачу."""
-#
-#     __tablename__ = "task_responsibles"
-#     __table_args__ = (
-#         UniqueConstraint("user_id", "task_id", name="uq_task_responsible"),
-#         {"comment": "Ответственные за задачу"},
-#     )
-#
-#     task_id: Mapped[uuid.UUID] = mapped_column(
-#         ForeignKey("tasks.id", ondelete="CASCADE"), comment="Идентификатор задачи"
-#     )
-#     user_id: Mapped[uuid.UUID] = mapped_column(
-#         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя ответственного за задачу"
-#     )
-#
-#     def __repr__(self):
-#         return f"<TaskResponsible {self.task_id} - {self.user_id}>"
-
-
 class TaskComment(Base, UUIDPrimaryKeyMixin):
     """Модель комментария к задаче."""
 

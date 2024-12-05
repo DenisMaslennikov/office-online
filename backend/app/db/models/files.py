@@ -29,8 +29,6 @@ class FilesGroup(Base, UUIDPrimaryKeyMixin):
     company_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор организации"
     )
-    # file_group_type_id: Mapped[int] = mapped_column(SMALLINT, comment="Идентификатор типа группы")
-    # path: Mapped[LtreeType] = mapped_column(LtreeType, comment="Иерархия групп файлов")
     parent_file_group_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Родительская группа файлов"
     )
