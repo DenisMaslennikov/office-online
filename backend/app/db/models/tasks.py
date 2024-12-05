@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import BIGINT, TIMESTAMP, ForeignKey, Interval, String, UniqueConstraint, func, Integer
+from sqlalchemy import BIGINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.dialects.mysql import SMALLINT
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -137,7 +137,7 @@ class LinkedTask(Base, BigIntPrimaryKeyMixin):
 
 
 class TaskTimeSpend(Base, BigIntPrimaryKeyMixin):
-    """Учет времени потраченного на задачу"""
+    """Учет времени потраченного на задачу."""
 
     __tablename__ = "task_time_spend"
     description: Mapped[str] = mapped_column(comment="Описание")

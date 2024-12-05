@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import BIGINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DEFAULT_FILE_GROUP_ICON_ID, DELETED_COMPANY_ID, DELETED_USER_ID

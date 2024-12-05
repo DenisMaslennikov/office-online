@@ -1,26 +1,26 @@
 from app.db.models.base import Base
-from app.db.models.boards import Board, BoardColumn, BoardTemplate, BoardsTemplatesColumns
-from app.db.models.chats import ChannelsGroup, Channel, Message, LastReadMessageByUser
+from app.db.models.boards import Board, BoardColumn, BoardsTemplatesColumns, BoardTemplate
+from app.db.models.chats import Channel, ChannelsGroup, LastReadMessageByUser, Message
 from app.db.models.classifiers import (
-    Timezone,
-    Role,
-    TaskType,
-    Icon,
-    EventType,
     ContextType,
+    EventType,
+    Icon,
     Permission,
     ProjectType,
+    Role,
     TaskLinkType,
+    TaskType,
+    Timezone,
 )
 from app.db.models.companies import Company
-from app.db.models.files import FilesGroup, File, FileInGroup, TaskAttachment, CommentAttachment, MessageAttachment
+from app.db.models.files import CommentAttachment, File, FileInGroup, FilesGroup, MessageAttachment, TaskAttachment
 from app.db.models.logs import Log
 from app.db.models.permissions import CompanyUserRole, SubjectPermissionToObject
 from app.db.models.projects import Project
-from app.db.models.tags import Tag, TaskTag, FileTag
-from app.db.models.tasks import Task, ChildTask, TaskComment, LinkedTask, TaskTimeSpend
-from app.db.models.users import User, UserCompanyMembership
 from app.db.models.sprints import Sprint, TasksSprint
+from app.db.models.tags import FileTag, Tag, TaskTag
+from app.db.models.tasks import ChildTask, LinkedTask, Task, TaskComment, TaskTimeSpend
+from app.db.models.users import User, UserCompanyMembership
 
 __all__ = [
     "Sprint",
@@ -61,7 +61,6 @@ __all__ = [
     "FileTag",
     "Task",
     "ChildTask",
-    "TaskResponsible",
     "TaskComment",
     "User",
     "UserCompanyMembership",

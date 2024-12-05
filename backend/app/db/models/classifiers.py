@@ -117,53 +117,6 @@ class Icon(Base, BigIntPrimaryKeyMixin):
         return f"<Icon {self.company_id} - {self.file_name}>"
 
 
-# class IconCategory(Base, SmallIntPrimaryKeyMixin):
-#     """Модель классификатора категорий иконок."""
-#
-#     __tablename__ = "icons_categories"
-#
-#     name: Mapped[str] = mapped_column(String(100), comment="Наименование категории иконок")
-#     description: Mapped[str] = mapped_column(comment="Описание категории иконок")
-#
-#     def __repr__(self):
-#         return f"<IconCategory {self.name}>"
-
-
-# class FileGroupType(Base, SmallIntPrimaryKeyMixin):
-#     """Классификатор типов групп."""
-#
-#     __tablename__ = "file_group_types"
-#
-#     display_name: Mapped[str] = mapped_column(String(100), comment="Наименование группы файлов", unique=True)
-#     system_name: Mapped[str] = mapped_column(String(100), comment="Системное имя типа группы файлов", unique=True)
-#     can_change_permissions: Mapped[bool] = mapped_column(comment="Можно ли у группы менять права")
-#     can_delete: Mapped[bool] = mapped_column(comment="Можно ли удалять группу")
-#     trash: Mapped[bool] = mapped_column(comment="Признак того что группа является корзиной")
-#
-#     def __repr__(self):
-#         return f"<FileGroupType {self.system_name}>"
-
-
-# class FileGroupTypeDefaultPermission(Base, SmallIntPrimaryKeyMixin):
-#     """Настройки прав по умолчанию для типов групп файлов."""
-#
-#     __tablename__ = "file_group_type_default_permissions"
-#
-#     role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"), comment="Идентификатор роли")
-#     file_group_type_id: Mapped[int] = mapped_column(
-#         SMALLINT, ForeignKey("file_group_types.id", ondelete="CASCADE"), comment="Идентификатор типа группы файлов"
-#     )
-#     file_group_permission_id: Mapped[int] = mapped_column(
-#         SMALLINT, ForeignKey("file_group_permissions.id", ondelete="CASCADE"), comment="Идентификатор разрешения"
-#     )
-#
-#     def __repr__(self):
-#         return (
-#             f"<FileGroupTypeDefaultPermission {self.role_id}: {self.file_group_type_id} - "
-#             f"{self.file_group_permission_id}>"
-#         )
-
-
 class EventType(Base, SmallIntPrimaryKeyMixin):
     """Классификатор событий для записи в логе."""
 

@@ -1,7 +1,7 @@
-import uuid
 import datetime
+import uuid
 
-from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, func
+from sqlalchemy import SMALLINT, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DELETED_USER_ID

@@ -1,11 +1,11 @@
 import datetime
 import uuid
 
-from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, text, UniqueConstraint
+from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.base import Base
-from app.db.models.mixins import UUIDPrimaryKeyMixin, BigIntPrimaryKeyMixin
+from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
 
 
 class User(Base, UUIDPrimaryKeyMixin):
