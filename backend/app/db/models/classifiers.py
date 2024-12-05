@@ -43,30 +43,6 @@ class Role(Base, UUIDPrimaryKeyMixin):
         return f"<Role {self.company_id} - {self.name}>"
 
 
-# class GlobalPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
-#     """Классификатор глобальных возможных разрешений."""
-#
-#     __tablename__ = "global_permissions"
-#
-#
-# class ProjectPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
-#     """Классификатор возможных разрешений для проекта."""
-#
-#     __tablename__ = "project_permissions"
-#
-#
-# class FileGroupPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
-#     """Классификатор возможных разрешений для группы файлов."""
-#
-#     __tablename__ = "file_group_permissions"
-#
-#
-# class ChannelPermission(Base, SmallIntPrimaryKeyMixin, PermissionClassifierMixin):
-#     """Классификатор возможных разрешений для каналов чата."""
-#
-#     __tablename__ = "channels_permissions"
-
-
 class TaskType(Base, BigIntPrimaryKeyMixin):
     """Пополняемый классификатор типов задач."""
 
