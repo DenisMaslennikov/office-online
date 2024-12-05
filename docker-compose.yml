@@ -17,10 +17,11 @@ services:
       - "8000:8000"
     volumes:
       - "./backend:/backend/"
-#      - "./certs:/certs"
+      - uploads:/uploads
     depends_on:
       - db
     restart: always
 
 volumes:
   pgdata:
+  uploads:
