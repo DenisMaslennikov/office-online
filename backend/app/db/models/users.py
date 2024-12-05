@@ -16,7 +16,7 @@ class User(Base, UUIDPrimaryKeyMixin):
     email: Mapped[str] = mapped_column(String(100), comment="Почта", unique=True)
     username: Mapped[str] = mapped_column(String(30), comment="Имя пользователя", unique=True)
     hashed_password: Mapped[str] = mapped_column(comment="Хеш пароля")
-    phone: Mapped[str] = mapped_column(String(30), comment="Номер телефона")
+    phone: Mapped[str | None] = mapped_column(String(30), comment="Номер телефона")
     display_name: Mapped[str] = mapped_column(String(60), comment="Имя для отображения")
     image: Mapped[str | None] = mapped_column(comment="Путь к файлу изображения пользователя", unique=True)
     timezone_id: Mapped[int | None] = mapped_column(
