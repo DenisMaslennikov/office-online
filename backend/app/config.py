@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     reload: bool = True
     debug: bool
 
-    uploads_path: str = BASE_DIR.parent() / "uploads"
+    uploads_path: Path = BASE_DIR.parent / "uploads"
 
     # Структура эндпоинтов API
     api: Api = Api()
