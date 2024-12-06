@@ -31,4 +31,6 @@ async def get_current_user(
     user = await crud.get_user_by_id_repo(session, user_id=user_id)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
+    if not user.active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Пользователь не активен")
     return user
