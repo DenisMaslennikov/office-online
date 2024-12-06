@@ -12,7 +12,7 @@ from app.api.v1.users import crud
 from app.api.v1.users.schemas import (
     JWTTokenForValidationSchema,
     JWTTokensPairWithTokenTypeSchema,
-    UserReadSchema,
+    UserResponseSchema,
     TokenValidationResultSchema,
 )
 from app.constants import DEFAULT_RESPONSES
@@ -62,7 +62,7 @@ async def token_validate(token: JWTTokenForValidationSchema) -> TokenValidationR
 
 @router.post(
     "/register/",
-    response_model=UserReadSchema,
+    response_model=UserResponseSchema,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "Пользователь с таким username или email уже зарегистрирован"},
     },

@@ -12,7 +12,7 @@ class UserLoginSchema(BaseModel):
     password: str = Field(..., examples=["password"])
 
 
-class UserReadSchema(BaseModel):
+class UserResponseSchema(BaseModel):
     """Сериализатор пользователя для операций чтения."""
 
     model_config = ConfigDict(from_attributes=True)
