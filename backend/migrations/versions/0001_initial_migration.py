@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2024-12-03 15:59:04.591556
+Create Date: 2024-12-06 14:17:05.504254
 
 """
 from typing import Sequence, Union
@@ -83,8 +83,8 @@ def upgrade() -> None:
     op.create_table('users',
     sa.Column('email', sa.String(length=100), nullable=False, comment='Почта'),
     sa.Column('username', sa.String(length=30), nullable=False, comment='Имя пользователя'),
-    sa.Column('hashed_password', sa.String(), nullable=False, comment='Хеш пароля'),
-    sa.Column('phone', sa.String(length=30), nullable=False, comment='Номер телефона'),
+    sa.Column('hashed_password', sa.String(), nullable=True, comment='Хеш пароля'),
+    sa.Column('phone', sa.String(length=30), nullable=True, comment='Номер телефона'),
     sa.Column('display_name', sa.String(length=60), nullable=False, comment='Имя для отображения'),
     sa.Column('image', sa.String(), nullable=True, comment='Путь к файлу изображения пользователя'),
     sa.Column('timezone_id', sa.SMALLINT(), nullable=True, comment='Идентификатор таймзоны'),
@@ -481,7 +481,7 @@ def upgrade() -> None:
     sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
     sa.ForeignKeyConstraint(['task_id'], ['tasks.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    comment='Учет времени потраченного на задачу'
+    comment='Учет времени потраченного на задачу.'
     )
     op.create_table('tasks_sprints',
     sa.Column('sprint_id', sa.BIGINT(), nullable=False, comment='Идентификатор спринта'),
