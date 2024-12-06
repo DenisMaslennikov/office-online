@@ -2,7 +2,9 @@ import datetime
 import uuid
 from typing import TYPE_CHECKING
 
+import bcrypt
 from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.models.base import Base
@@ -40,6 +42,24 @@ class User(Base, UUIDPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<User {self.username}({self.email})>"
+
+    @hybrid_property
+    def password(self):
+        """Hybrid property для пароля."""
+        raise AttributeError("Атрибут пароль нельзя читать напрямую.")
+
+    @password.setter
+    def password(self, plain_password: str) -> None:
+        """Сеттер пароля."""
+        self.hashed_password = self._generate_password_hash(plain_password)
+
+    def _generate_password_hash(self, plain_password: str) -> str:
+        """Генерация хеша пароля с использованием bcrypt."""
+        return bcrypt.hashpw(plain_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+    def verify_password(self, plain_password: str) -> bool:
+        """Проверка пароля через сравнение хеша."""
+        return bcrypt.checkpw(plain_password.encode("utf-8"), self.hashed_password.encode("utf-8"))
 
 
 class UserCompanyMembership(Base, BigIntPrimaryKeyMixin):
