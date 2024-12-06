@@ -69,13 +69,13 @@ async def token_validate(token: JWTTokenForValidationSchema) -> TokenValidationR
 )
 async def user_register(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-    email: EmailStr = Form(...),
-    username: str = Form(...),
-    display_name: str = Form(...),
-    password: str = Form(...),
-    phone: str | None = Form(None),
-    image: UploadFile | None = None,
-    timezone_id: int | None = Form(None),
+    email: Annotated[EmailStr, Form()],
+    username: Annotated[str, Form()],
+    display_name: Annotated[str, Form()],
+    password: Annotated[str, Form()],
+    phone: Annotated[str | None, Form()] = None,
+    image: Annotated[UploadFile | None, File()] = None,
+    timezone_id: Annotated[int | None, Form()] = None,
 ) -> User:
     """Создание нового пользователя."""
     user_from_bd = await crud.get_user_by_email_or_username_repo(session, email, username)
