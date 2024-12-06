@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import UploadFile
 from sqlalchemy import Result, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.strategy_options import _AbstractLoad
 
 from app.config import settings
@@ -32,6 +33,7 @@ async def create_user_repo(
     user.image = await save_file(image, settings.files.users_images_path)
     session.add(user)
     await session.commit()
+    user = await get_user_by_id_repo(session, user.id, joinedload(User.timezone))
     return user
 
 
