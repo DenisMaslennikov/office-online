@@ -5,7 +5,9 @@ from sqlalchemy import Result, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.strategy_options import _AbstractLoad
 
+from app.config import settings
 from app.db.models import User
+from app.utils.file_utils import save_file
 
 
 async def create_user_repo(
@@ -27,6 +29,7 @@ async def create_user_repo(
         timezone_id=timezone_id,
     )
     user.password = password
+    user.image = await save_file(image, settings.files.users_images_path)
     session.add(user)
     await session.commit()
     return user
