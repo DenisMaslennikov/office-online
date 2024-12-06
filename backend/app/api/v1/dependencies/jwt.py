@@ -7,12 +7,12 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing_extensions import Annotated
 
 from app.api.v1.auth.jwt import decode_token
-from app.api.v1.users.schemas import RefreshToken
+from app.api.v1.users.schemas import RefreshTokenSchema
 
 http_bearer = HTTPBearer()
 
 
-def get_payload_from_refresh_token_from_json(token: RefreshToken) -> dict[str, datetime | str]:
+def get_payload_from_refresh_token_from_json(token: RefreshTokenSchema) -> dict[str, datetime | str]:
     """Получает payload из refresh токена содержащегося в json."""
     return decode_token(token.refresh_token)
 

@@ -6,13 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies.jwt import get_current_user_id
 from app.api.v1.users import crud
-from app.api.v1.users.schemas import UserLogin
+from app.api.v1.users.schemas import UserLoginSchema
 from app.db import db_helper
 from app.db.models import User
 
 
 async def auth_user(
-    user_credentials: UserLogin, session: Annotated[AsyncSession, Depends(db_helper.get_session)]
+    user_credentials: UserLoginSchema, session: Annotated[AsyncSession, Depends(db_helper.get_session)]
 ) -> User:
     """Возвращает авторизованного пользователя."""
     user = await crud.get_user_by_email_repo(session, user_credentials.email)
