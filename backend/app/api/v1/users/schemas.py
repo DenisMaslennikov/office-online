@@ -1,10 +1,9 @@
 from uuid import UUID
 
-from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 
-from app.config import settings
 from app.api.v1.classifiers.schemas import TimezoneReadSchema
+from app.config import settings
 
 
 class UserLoginSchema(BaseModel):

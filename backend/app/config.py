@@ -1,4 +1,3 @@
-import os.path
 from datetime import timedelta
 from pathlib import Path
 
@@ -18,14 +17,14 @@ class ApiV1(BaseModel):
     """Апи первой версии."""
 
     prefix: str = "/v1"
-    endpoints: ApiV1Endpoints = ApiV1Endpoints()
+    endpoints: ApiV1Endpoints
 
 
 class Api(BaseModel):
     """Апи."""
 
     prefix: str = "/api"
-    v1: ApiV1 = ApiV1()
+    v1: ApiV1
 
 
 class DataBaseSettings(BaseModel):
@@ -89,10 +88,10 @@ class Settings(BaseSettings):
     files_urls: FilesUrlsSettings
 
     # Структура эндпоинтов API
-    api: Api = Api()
+    api: Api
 
     # Настройки безопасности
-    jwt: JWTSettings = JWTSettings()
+    jwt: JWTSettings
 
     model_config = SettingsConfigDict(case_sensitive=False, env_prefix="API_", env_nested_delimiter="__")
 
