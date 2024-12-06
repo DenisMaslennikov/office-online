@@ -1,11 +1,15 @@
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.db.models import Timezone
 
 
 class User(Base, UUIDPrimaryKeyMixin):
@@ -31,6 +35,8 @@ class User(Base, UUIDPrimaryKeyMixin):
     scheduled_deletion_date: Mapped[datetime.datetime] = mapped_column(
         TIMESTAMP, comment="Запланированная дата удаления"
     )
+
+    timezone: Timezone = relationship()
 
     def __repr__(self):
         return f"<User {self.username}({self.email})>"
