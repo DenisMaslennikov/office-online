@@ -1,7 +1,9 @@
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from fastapi import UploadFile
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 
+from app.config import settings
 from app.api.v1.classifiers.schemas import TimezoneReadSchema
 
 
@@ -21,10 +23,18 @@ class UserResponseSchema(BaseModel):
     email: EmailStr
     username: str
     display_name: str
-    phone: str
-    image: str
-    timezone: TimezoneReadSchema
+    phone: str | None
+    image: str | None
+    timezone: TimezoneReadSchema | None
     is_bot: bool
+
+    @computed_field
+    @property
+    def image_url(self) -> str | None:
+        """Получение url для файла изображения."""
+        if self.image is None:
+            return None
+        return f"{settings.files_urls.users_images_url}{self.image}"
 
 
 class JWTTokensPairBaseSchema(BaseModel):
