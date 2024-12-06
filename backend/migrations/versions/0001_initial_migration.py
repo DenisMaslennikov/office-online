@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2024-12-06 14:17:05.504254
+Create Date: 2024-12-06 14:20:29.335588
 
 """
 from typing import Sequence, Union
@@ -90,7 +90,7 @@ def upgrade() -> None:
     sa.Column('timezone_id', sa.SMALLINT(), nullable=True, comment='Идентификатор таймзоны'),
     sa.Column('is_bot', sa.Boolean(), server_default=sa.text('false'), nullable=False, comment='Является ли пользователь ботом'),
     sa.Column('active', sa.Boolean(), server_default='true', nullable=False, comment='Активен ли аккаунт пользователя'),
-    sa.Column('scheduled_deletion_date', sa.TIMESTAMP(), nullable=False, comment='Запланированная дата удаления'),
+    sa.Column('scheduled_deletion_date', sa.TIMESTAMP(), nullable=True, comment='Запланированная дата удаления'),
     sa.Column('id', sa.Uuid(), server_default=sa.text('gen_random_uuid()'), nullable=False, comment='Идентификатор'),
     sa.ForeignKeyConstraint(['timezone_id'], ['timezones.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id'),
