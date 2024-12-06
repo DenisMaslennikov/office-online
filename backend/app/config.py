@@ -1,3 +1,4 @@
+import os.path
 from datetime import timedelta
 from pathlib import Path
 
@@ -58,6 +59,20 @@ class JWTSettings(BaseModel):
     refresh_token_expires_delta: timedelta = timedelta(days=7)
 
 
+class FilesSettings(BaseModel):
+    """Настройки хранения файлов."""
+
+    uploads_path: str
+    users_images_path: str
+
+
+class FilesUrlsSettings(BaseModel):
+    """Пути к файлам для формирования url."""
+
+    media: str
+    users_images_url: str
+
+
 class Settings(BaseSettings):
     """Конфигурация бекенда."""
 
@@ -67,7 +82,11 @@ class Settings(BaseSettings):
     reload: bool = True
     debug: bool
 
-    uploads_path: Path = BASE_DIR.parent / "uploads"
+    # Хранение файлов.
+    files: FilesSettings
+
+    # Раздача файлов через Nginx
+    files_urls: FilesUrlsSettings
 
     # Структура эндпоинтов API
     api: Api = Api()
