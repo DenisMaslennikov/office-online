@@ -32,7 +32,7 @@ class User(Base, UUIDPrimaryKeyMixin):
         comment="Является ли пользователь ботом", server_default=text("false"), default=False
     )
     active: Mapped[bool] = mapped_column(comment="Активен ли аккаунт пользователя", default=True, server_default="true")
-    scheduled_deletion_date: Mapped[datetime.datetime] = mapped_column(
+    scheduled_deletion_date: Mapped[datetime.datetime | None] = mapped_column(
         TIMESTAMP, comment="Запланированная дата удаления"
     )
 
