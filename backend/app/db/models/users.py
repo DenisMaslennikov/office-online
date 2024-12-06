@@ -36,7 +36,7 @@ class User(Base, UUIDPrimaryKeyMixin):
         TIMESTAMP, comment="Запланированная дата удаления"
     )
 
-    timezone: Timezone = relationship()
+    timezone: Mapped["Timezone"] = relationship()
 
     def __repr__(self):
         return f"<User {self.username}({self.email})>"
