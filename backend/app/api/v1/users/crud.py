@@ -81,7 +81,7 @@ async def schedule_user_deletion(session: AsyncSession, user: User) -> User:
 
 
 async def update_user_repo(session: AsyncSession, user: User, new_user_data, partial: bool = False) -> User:
-    """Полное или частичное обновление информации о пользователи."""
+    """Полное или частичное обновление информации о пользователе."""
     user_data = new_user_data.model_dump(exclude_unset=partial)
     for key, value in user_data.items():
         setattr(user, key, value)
