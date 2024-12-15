@@ -80,12 +80,6 @@ async def schedule_user_deletion(session: AsyncSession, user: User) -> User:
     return user
 
 
-async def delete_user_from_db_repo(session: AsyncSession, user: User) -> None:
-    """Удаляет пользователя из базы."""
-    await session.delete(user)
-    await session.commit()
-
-
 async def update_user_repo(session: AsyncSession, user: User, new_user_data, partial: bool = False) -> User:
     """Полное или частичное обновление информации о пользователи."""
     user_data = new_user_data.model_dump(exclude_unset=partial)
