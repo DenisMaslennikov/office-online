@@ -72,8 +72,29 @@ class FilesUrlsSettings(BaseModel):
     users_images_url: str
 
 
+class UsersSettings(BaseModel):
+    """Настройки пользователей."""
+
+    # Интервал времени для удаления пользователя
+    # TODO Написать задачу для Celery для удаления файлов из корзины
+    user_deletion_timedelta: timedelta = timedelta(days=30)
+
+
+class CompaniesSettings(BaseModel):
+    """Настройки компании."""
+
+    # Интервал времени для удаления компании
+    # TODO Написать задачу для Celery для удаления пользователя
+    user_deletion_timedelta: timedelta = timedelta(days=30)
+
+
 class Settings(BaseSettings):
     """Конфигурация бекенда."""
+
+    # Настройки пользователей
+    users: UsersSettings = UsersSettings()
+    # Настройка компаний
+    companies: CompaniesSettings = CompaniesSettings()
 
     # Настройки подключения к базе данных
     db: DataBaseSettings

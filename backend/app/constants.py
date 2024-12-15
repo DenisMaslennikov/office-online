@@ -36,15 +36,6 @@ DELETED_MESSAGE_ID = 1
 # TODO Написать задачу для Celery для удаления компании
 COMPANY_DELETION_TIMEDELTA = timedelta(days=30)
 
-# Интервал по умолчанию для удаления компании.
-# TODO Написать задачу для Celery для удаления пользователя
-USER_DELETION_TIMEDELTA = timedelta(days=30)
-
-# Интервал отчистки корзины
-# TODO Написать задачу для Celery для удаления файлов из корзины
-FILE_IN_TRASH_LIFETIME_TIMEDELTA = timedelta(days=30)
-
-
 # Корневая директория проекта.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
