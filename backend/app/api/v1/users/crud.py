@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import UploadFile
@@ -72,7 +73,14 @@ async def get_user_by_id_repo(session: AsyncSession, user_id: UUID, *option: _Ab
     return results.scalar()
 
 
-async def delete_user_repo(session: AsyncSession, user: User) -> None:
+async def schedule_user_deletion(session: AsyncSession, user: User) -> User:
+    """Добавляет пользователя в очередь на удаление."""
+    user.scheduled_deletion_date = datetime.now(timezone.utc) + settings.users.user_deletion_timedelta
+    await session.commit()
+    return user
+
+
+async def delete_user_from_db_repo(session: AsyncSession, user: User) -> None:
     """Удаляет пользователя из базы."""
     await session.delete(user)
     await session.commit()
