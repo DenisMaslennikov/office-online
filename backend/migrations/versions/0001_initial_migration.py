@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2024-12-06 14:20:29.335588
+Create Date: 2024-12-19 14:16:52.707937
 
 """
 from typing import Sequence, Union
@@ -35,6 +35,23 @@ def upgrade() -> None:
     sa.UniqueConstraint('system_name'),
     comment='Классификатор событий для записи в логе.'
     )
+    op.create_table('messages',
+    sa.Column('content', sa.String(), nullable=False, comment='Содержимое сообщения'),
+    sa.Column('channel_id', sa.Uuid(), nullable=True, comment='Идентификатор канала'),
+    sa.Column('thread_id', sa.BIGINT(), nullable=True, comment='Идентификатор треда'),
+    sa.Column('user_id', sa.Uuid(), nullable=False, comment='Идентификатор пользователя'),
+    sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False, comment='Время создания сообщения'),
+    sa.Column('updated_at', sa.TIMESTAMP(), nullable=True, comment='Время последнего изменения сообщения'),
+    sa.Column('quoted_message_id', sa.BIGINT(), nullable=False, comment='Идентификатор цитируемого сообщения'),
+    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text('false'), nullable=False, comment='Сообщение помечено как удаленное'),
+    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['channel_id'], ['channels.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['quoted_message_id'], ['messages.id'], ondelete='SET DEFAULT'),
+    sa.ForeignKeyConstraint(['thread_id'], ['threads.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='SET DEFAULT'),
+    sa.PrimaryKeyConstraint('id'),
+    comment='Модель сообщения.'
+    )
     op.create_table('project_types',
     sa.Column('name', sa.String(length=30), nullable=False, comment='Название типа проекта'),
     sa.Column('id', sa.SMALLINT(), nullable=False, comment='Идентификатор'),
@@ -47,6 +64,17 @@ def upgrade() -> None:
     sa.Column('id', sa.SMALLINT(), nullable=False, comment='Идентификатор'),
     sa.PrimaryKeyConstraint('id'),
     comment='Классификатор типов связи задач.'
+    )
+    op.create_table('threads',
+    sa.Column('parent_message_id', sa.BIGINT(), nullable=False),
+    sa.Column('title', sa.String(), nullable=False, comment='Заголовок треда'),
+    sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False, comment='Время создания треда'),
+    sa.Column('channel_id', sa.Uuid(), nullable=False, comment='Идентификатор канала'),
+    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['channel_id'], ['channels.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['parent_message_id'], ['messages.id'], ondelete='SET DEFAULT'),
+    sa.PrimaryKeyConstraint('id'),
+    comment='Модель для хранения тредов.'
     )
     op.create_table('timezones',
     sa.Column('display_name', sa.String(length=30), nullable=False, comment='Отображаемое имя часового пояса'),
@@ -235,6 +263,16 @@ def upgrade() -> None:
     sa.UniqueConstraint('name', 'company_id', name='uq_file_group_name'),
     comment='Группы файлов'
     )
+    op.create_table('message_attachments',
+    sa.Column('message_id', sa.BIGINT(), nullable=False, comment='Идентификатор сообщения'),
+    sa.Column('file_id', sa.Uuid(), nullable=False, comment='Идентификатор файла'),
+    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
+    sa.ForeignKeyConstraint(['file_id'], ['files.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['message_id'], ['messages.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('message_id', 'file_id', name='uq_message_attachment'),
+    comment='Файлы прикрепленные к сообщению в чате'
+    )
     op.create_table('projects',
     sa.Column('name', sa.String(length=255), nullable=False, comment='Название проекта'),
     sa.Column('prefix', sa.String(length=50), nullable=False, comment='Префикс проекта'),
@@ -286,19 +324,19 @@ def upgrade() -> None:
     sa.UniqueConstraint('file_id', 'files_group_id', name='uq_file_in_group'),
     comment='Привязка файла к группе'
     )
-    op.create_table('messages',
-    sa.Column('content', sa.String(), nullable=False, comment='Содержимое сообщения'),
-    sa.Column('channel_id', sa.Uuid(), nullable=False, comment='Идентификатор канала'),
+    op.create_table('last_read_message_by_user',
+    sa.Column('message_id', sa.BIGINT(), nullable=False, comment='Идентификатор сообщения'),
     sa.Column('user_id', sa.Uuid(), nullable=False, comment='Идентификатор пользователя'),
-    sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False, comment='Время создания сообщения'),
-    sa.Column('updated_at', sa.TIMESTAMP(), nullable=True, comment='Время последнего изменения сообщения'),
-    sa.Column('quoted_message_id', sa.BIGINT(), nullable=False, comment='Идентификатор цитируемого сообщения'),
+    sa.Column('channel_id', sa.Uuid(), nullable=True, comment='Идентификатор канала'),
+    sa.Column('thread_id', sa.BIGINT(), nullable=True, comment='Идентификатор треда'),
     sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
     sa.ForeignKeyConstraint(['channel_id'], ['channels.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['quoted_message_id'], ['messages.id'], ondelete='SET DEFAULT'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='SET DEFAULT'),
+    sa.ForeignKeyConstraint(['message_id'], ['messages.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['thread_id'], ['threads.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    comment='Модель сообщения.'
+    sa.UniqueConstraint('user_id', 'channel_id', name='uq_last_read_message_by_user_chanel'),
+    comment='Таблица хранящая последнее прочитанное сообщение в чате для пользователя.'
     )
     op.create_table('sprints',
     sa.Column('name', sa.String(length=100), nullable=False, comment='Название спринта'),
@@ -381,28 +419,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('tag_id', 'file_id', name='uq_file_tag'),
     comment='Теги на файлах'
-    )
-    op.create_table('last_read_message_by_user',
-    sa.Column('message_id', sa.BIGINT(), nullable=False, comment='Идентификатор сообщения'),
-    sa.Column('user_id', sa.Uuid(), nullable=False, comment='Идентификатор пользователя'),
-    sa.Column('channel_id', sa.Uuid(), nullable=False, comment='Идентификатор канала'),
-    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
-    sa.ForeignKeyConstraint(['channel_id'], ['channels.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['message_id'], ['messages.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_id', 'channel_id', name='uq_last_read_message_by_user_chanel'),
-    comment='Таблица хранящая последнее прочитанное сообщение в чате для пользователя.'
-    )
-    op.create_table('message_attachments',
-    sa.Column('message_id', sa.BIGINT(), nullable=False, comment='Идентификатор сообщения'),
-    sa.Column('file_id', sa.Uuid(), nullable=False, comment='Идентификатор файла'),
-    sa.Column('id', sa.BIGINT(), nullable=False, comment='Идентификатор'),
-    sa.ForeignKeyConstraint(['file_id'], ['files.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['message_id'], ['messages.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('message_id', 'file_id', name='uq_message_attachment'),
-    comment='Файлы прикрепленные к сообщению в чате'
     )
     op.create_table('tasks',
     sa.Column('name', sa.String(length=255), nullable=False, comment='Название задачи'),
@@ -526,19 +542,18 @@ def downgrade() -> None:
     op.drop_table('linked_tasks')
     op.drop_table('child_tasks')
     op.drop_table('tasks')
-    op.drop_table('message_attachments')
-    op.drop_table('last_read_message_by_user')
     op.drop_table('files_tags')
     op.drop_table('boards_templates_columns')
     op.drop_table('boards_columns')
     op.drop_table('task_types')
     op.drop_table('tags')
     op.drop_table('sprints')
-    op.drop_table('messages')
+    op.drop_table('last_read_message_by_user')
     op.drop_table('files_in_groups')
     op.drop_table('boards_templates')
     op.drop_table('boards')
     op.drop_table('projects')
+    op.drop_table('message_attachments')
     op.drop_table('files_groups')
     op.drop_table('company_users_roles')
     op.drop_table('channels')
@@ -553,8 +568,10 @@ def downgrade() -> None:
     op.drop_table('permissions')
     op.drop_table('companies')
     op.drop_table('timezones')
+    op.drop_table('threads')
     op.drop_table('task_link_types')
     op.drop_table('project_types')
+    op.drop_table('messages')
     op.drop_table('event_types')
     op.drop_table('context_types')
     # ### end Alembic commands ###
