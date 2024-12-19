@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DELETED_MESSAGE_ID, DELETED_USER_ID
@@ -72,8 +72,11 @@ class Message(Base, BigIntPrimaryKeyMixin):
     __tablename__ = "messages"
 
     content: Mapped[str] = mapped_column(comment="Содержимое сообщения")
-    channel_id: Mapped[uuid.UUID] = mapped_column(
+    channel_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
+    )
+    thread_id: Mapped[int | None] = mapped_column(
+        BIGINT, ForeignKey("threads.id", ondelete="CASCADE"), comment="Идентификатор треда"
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="SET DEFAULT"),
@@ -91,6 +94,11 @@ class Message(Base, BigIntPrimaryKeyMixin):
         ForeignKey("messages.id", ondelete="SET DEFAULT"),
         default=DELETED_MESSAGE_ID,
         comment="Идентификатор цитируемого сообщения",
+    )
+    is_deleted: Mapped[bool] = mapped_column(
+        comment="Сообщение помечено как удаленное",
+        default=False,
+        server_default=text("false"),
     )
 
     def __repr__(self):
@@ -112,9 +120,30 @@ class LastReadMessageByUser(Base, BigIntPrimaryKeyMixin):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), comment="Идентификатор пользователя"
     )
-    channel_id: Mapped[uuid.UUID] = mapped_column(
+    channel_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
+    )
+    thread_id: Mapped[int | None] = mapped_column(
+        BIGINT, ForeignKey("threads.id", ondelete="CASCADE"), comment="Идентификатор треда"
     )
 
     def __repr__(self):
         return f"<LastReadMessageByUser {self.user_id}: {self.channel_id} - {self.message_id}>"
+
+
+class Thread(Base, BigIntPrimaryKeyMixin):
+    """Модель для хранения тредов."""
+
+    __tablename__ = "threads"
+    parent_message_id: Mapped[int] = mapped_column(
+        BIGINT,
+        ForeignKey("messages.id", ondelete="SET DEFAULT"),
+        default=DELETED_MESSAGE_ID,  # TODO подумать где будет выводится тред если родительское сообщение удалено.
+    )
+    title: Mapped[str] = mapped_column(comment="Заголовок треда")
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        TIMESTAMP, server_default=func.now(), default=datetime.datetime.now, comment="Время создания треда"
+    )
+    channel_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
+    )
