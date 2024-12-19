@@ -36,14 +36,16 @@ class Task(Base, UUIDPrimaryKeyMixin):
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
     color: Mapped[str] = mapped_column(String(9), comment="Цвет задачи")
-    deadline: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Выполнить до")
+    deadline: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP(timezone=True), comment="Выполнить до")
     task_type_id: Mapped[int] = mapped_column(
         BIGINT, ForeignKey("task_types.id", ondelete="RESTRICT"), comment="Идентификатор типа задачи"
     )
-    created_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP, server_default=func.now(), comment="Создана")
-    updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Обновлена")
-    completed_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Выполнена")
-    archived_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Архивирована")
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        TIMESTAMP(timezone=True), server_default=func.now(), comment="Создана"
+    )
+    updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP(timezone=True), comment="Обновлена")
+    completed_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP(timezone=True), comment="Выполнена")
+    archived_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP(timezone=True), comment="Архивирована")
     archived_by_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET DEFAULT"),
         default=DELETED_USER_ID,

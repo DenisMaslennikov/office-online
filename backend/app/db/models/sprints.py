@@ -19,8 +19,12 @@ class Sprint(Base, BigIntPrimaryKeyMixin):
     project_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
-    start_date: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Время начала спринта")
-    end_date: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Время завершения спринта")
+    start_date: Mapped[datetime.datetime | None] = mapped_column(
+        TIMESTAMP(timezone=True), comment="Время начала спринта"
+    )
+    end_date: Mapped[datetime.datetime | None] = mapped_column(
+        TIMESTAMP(timezone=True), comment="Время завершения спринта"
+    )
     status: Mapped[str] = mapped_column(sprint_status_enum, comment="Статус спринта", default="Планирование")
     story_points: Mapped[int | None] = mapped_column(BIGINT, comment="Стори поинты спринта")
 

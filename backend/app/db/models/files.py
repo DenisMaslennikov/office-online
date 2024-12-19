@@ -56,8 +56,10 @@ class File(Base, UUIDPrimaryKeyMixin):
     download_file_name: Mapped[str] = mapped_column(comment="Имя файла при скачивание")
     file_name: Mapped[str] = mapped_column(comment="Системное имя файла", unique=True)
     size: Mapped[int] = mapped_column(BIGINT, comment="Размер файла")
-    created_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP, comment="Время создания")
-    updated_at: Mapped[datetime.datetime | None] = mapped_column(TIMESTAMP, comment="Время последнего обновления")
+    created_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP(timezone=True), comment="Время создания")
+    updated_at: Mapped[datetime.datetime | None] = mapped_column(
+        TIMESTAMP(timezone=True), comment="Время последнего обновления"
+    )
     checksum: Mapped[str] = mapped_column(String(64), comment="Чексумма файла")
 
     def __repr__(self):
