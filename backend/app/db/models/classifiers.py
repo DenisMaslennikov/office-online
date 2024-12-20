@@ -87,7 +87,7 @@ class Icon(Base, BigIntPrimaryKeyMixin):
         default=DELETED_COMPANY_ID,
     )
     file_name: Mapped[str] = mapped_column(comment="Имя файла", unique=True)
-    icon_category_id: Mapped[str] = mapped_column(icon_category_enum, comment="Категория иконок")
+    icon_category: Mapped[str] = mapped_column(icon_category_enum, comment="Категория иконок")
 
     def __repr__(self):
         return f"<Icon {self.company_id} - {self.file_name}>"
