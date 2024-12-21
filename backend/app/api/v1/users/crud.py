@@ -31,7 +31,8 @@ async def create_user_repo(
         timezone_id=timezone_id,
     )
     user.password = password
-    user.image = await save_file(image, settings.files.users_images_path)
+    if image is not None:
+        user.image = await save_file(image, settings.files.users_images_path)
     session.add(user)
     await session.commit()
     user = await get_user_by_id_repo(session, user.id, joinedload(User.timezone))
