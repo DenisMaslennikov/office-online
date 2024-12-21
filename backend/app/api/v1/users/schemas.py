@@ -21,9 +21,9 @@ class UserResponseSchema(BaseModel):
     id: UUID
     email: EmailStr
     username: str
-    display_name: str
+    display_name: str | None
     phone: str | None
-    image: str | None
+    image: str | None = Field(exclude=True)
     timezone: TimezoneReadSchema | None
     is_bot: bool
 
