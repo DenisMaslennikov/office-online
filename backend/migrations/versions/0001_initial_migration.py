@@ -25,7 +25,7 @@ def upgrade() -> None:
         "context_types",
         sa.Column("system_name", sa.String(length=20), nullable=False, comment="Системное имя контекста"),
         sa.Column(
-            "display_name", sa.String(length=20), nullable=True, comment="Имя контекста для отображения пользователю"
+            "display_name", sa.String(length=20), nullable=False, comment="Имя контекста для отображения пользователю"
         ),
         sa.Column("id", sa.SMALLINT(), nullable=False, comment="Идентификатор"),
         sa.PrimaryKeyConstraint("id"),
@@ -100,7 +100,7 @@ def upgrade() -> None:
         sa.Column("username", sa.String(length=30), nullable=False, comment="Имя пользователя"),
         sa.Column("hashed_password", sa.String(), nullable=True, comment="Хеш пароля"),
         sa.Column("phone", sa.String(length=30), nullable=True, comment="Номер телефона"),
-        sa.Column("display_name", sa.String(length=60), nullable=False, comment="Имя для отображения"),
+        sa.Column("display_name", sa.String(length=60), nullable=True, comment="Имя для отображения"),
         sa.Column("image", sa.String(), nullable=True, comment="Путь к файлу изображения пользователя"),
         sa.Column("timezone_id", sa.SMALLINT(), nullable=True, comment="Идентификатор таймзоны"),
         sa.Column(
