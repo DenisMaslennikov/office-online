@@ -70,7 +70,7 @@ async def user_register(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     email: Annotated[EmailStr, Form()],
     username: Annotated[str, Form()],
-    display_name: Annotated[str, Form()],
+    display_name: Annotated[str | None, Form()],
     password: Annotated[str, Form()],
     phone: Annotated[str | None, Form()] = None,
     image: Annotated[UploadFile | None, File()] = None,
