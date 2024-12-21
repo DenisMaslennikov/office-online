@@ -17,7 +17,7 @@ def get_payload_from_refresh_token_from_json(token: RefreshTokenSchema) -> dict[
     return decode_token(token.refresh_token)
 
 
-def user_id_from_refresh_token(payload: Annotated[dict, Depends(get_payload_from_refresh_token_from_json)]) -> UUID:
+def get_user_id_from_refresh_token(payload: Annotated[dict, Depends(get_payload_from_refresh_token_from_json)]) -> UUID:
     """Получает user_id из refresh токена."""
     if payload.get("token_type") != "refresh":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Тип токена должен быть 'refresh'")

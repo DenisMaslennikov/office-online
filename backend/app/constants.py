@@ -41,7 +41,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Коды ответов по умолчанию.
 DEFAULT_RESPONSES = {
-    status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized"},
-    status.HTTP_403_FORBIDDEN: {"description": "Forbidden"},
-    status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+    status.HTTP_401_UNAUTHORIZED: {"description": "Ошибка авторизации"},
+    status.HTTP_403_FORBIDDEN: {"description": "Пользователь не активен или недостаточно прав"},
+    status.HTTP_404_NOT_FOUND: {"description": "Пользователь не найден"},
 }

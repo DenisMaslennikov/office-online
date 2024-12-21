@@ -1,13 +1,11 @@
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.auth.jwt import create_access_token, create_refresh_token, decode_token
-from app.api.v1.dependencies.jwt import user_id_from_refresh_token
-from app.api.v1.dependencies.users import auth_user
+from app.api.v1.dependencies.users import auth_user, get_user_from_refresh_token
 from app.api.v1.users import crud
 from app.api.v1.users.schemas import (
     JWTTokenForValidationSchema,
@@ -24,7 +22,10 @@ router = APIRouter(tags=["Users"])
 @router.post(
     "/jwt/create/",
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_401_UNAUTHORIZED: {"description": "Ошибка авторизации"}},
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"description": "Ошибка авторизации"},
+        status.HTTP_403_FORBIDDEN: {"description": "Аккаунт пользователя не активен"},
+    },
 )
 async def create_tokens(user: Annotated[User, Depends(auth_user)]) -> JWTTokensPairWithTokenTypeSchema:
     """Логин пользователя для получения JWT токенов."""
@@ -36,15 +37,18 @@ async def create_tokens(user: Annotated[User, Depends(auth_user)]) -> JWTTokensP
 
 @router.post(
     "/jwt/refresh/",
-    responses={status.HTTP_401_UNAUTHORIZED: {"description": "Некорректный refresh токен"}},
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"description": "Некорректный refresh токен"},
+        status.HTTP_403_FORBIDDEN: {"description": "Аккаунт пользователя не активен"},
+    },
 )
 async def tokens_refresh(
-    user_id: Annotated[UUID, Depends(user_id_from_refresh_token)]
+    user: Annotated[User, Depends(get_user_from_refresh_token)]
 ) -> JWTTokensPairWithTokenTypeSchema:
     """Обновление токенов по refresh токену."""
     return JWTTokensPairWithTokenTypeSchema(
-        access_token=create_access_token(user_id),
-        refresh_token=create_refresh_token(user_id),
+        access_token=create_access_token(user.id),
+        refresh_token=create_refresh_token(user.id),
     )
 
 
