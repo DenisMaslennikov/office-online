@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2024-12-19 14:16:52.707937
+Create Date: 2024-12-21 09:59:13.112118
 
 """
 
@@ -155,8 +155,8 @@ def upgrade() -> None:
         sa.Column("download_file_name", sa.String(), nullable=False, comment="Имя файла при скачивание"),
         sa.Column("file_name", sa.String(), nullable=False, comment="Системное имя файла"),
         sa.Column("size", sa.BIGINT(), nullable=False, comment="Размер файла"),
-        sa.Column("created_at", sa.TIMESTAMP(), nullable=False, comment="Время создания"),
-        sa.Column("updated_at", sa.TIMESTAMP(), nullable=True, comment="Время последнего обновления"),
+        sa.Column("created_at", sa.TIMESTAMP(timezone=True), nullable=False, comment="Время создания"),
+        sa.Column("updated_at", sa.TIMESTAMP(timezone=True), nullable=True, comment="Время последнего обновления"),
         sa.Column("checksum", sa.String(length=64), nullable=False, comment="Чексумма файла"),
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False, comment="Идентификатор"
@@ -172,8 +172,8 @@ def upgrade() -> None:
         sa.Column("company_id", sa.Uuid(), nullable=True, comment="Идентификатор организации"),
         sa.Column("file_name", sa.String(), nullable=False, comment="Имя файла"),
         sa.Column(
-            "icon_category_id",
-            sa.Enum("TASK_TYPE", "FILE_GROUP", "PROJECT", name="icon_category"),
+            "icon_category",
+            sa.Enum("TASK_TYPE", "FILE_GROUP", "PROJECT", "CHANNEL", name="icon_category"),
             nullable=False,
             comment="Категория иконок",
         ),
@@ -217,6 +217,16 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("company_id", "name", name="uq_role_company"),
         comment="Классификатор ролей",
+    )
+    op.create_table(
+        "smiles",
+        sa.Column("company_id", sa.Uuid(), nullable=True, comment="Идентификатор компании"),
+        sa.Column("code", sa.String(length=30), nullable=False, comment="Код смайлика"),
+        sa.Column("filename", sa.String(), nullable=False, comment="Имя файла"),
+        sa.Column("id", sa.BIGINT(), nullable=False, comment="Идентификатор"),
+        sa.ForeignKeyConstraint(["company_id"], ["companies.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+        comment="Модель для хранения смайлов.",
     )
     op.create_table(
         "subject_permissions_to_object",
@@ -311,6 +321,7 @@ def upgrade() -> None:
         sa.Column("channel_id", sa.Uuid(), nullable=False, comment="Идентификатор канала"),
         sa.Column("id", sa.BIGINT(), nullable=False, comment="Идентификатор"),
         sa.ForeignKeyConstraint(["channel_id"], ["channels.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["parent_message_id"], ["messages.id"], ondelete="SET DEFAULT"),
         sa.PrimaryKeyConstraint("id"),
         comment="Модель для хранения тредов.",
     )
@@ -389,9 +400,13 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=255), nullable=False, comment="Имя доски"),
         sa.Column("description", sa.String(), nullable=True, comment="Описание доски"),
         sa.Column("project_id", sa.Uuid(), nullable=False, comment="идентификатор проекта"),
-        sa.Column("archived_at", sa.TIMESTAMP(), nullable=True, comment="Дата архивации"),
+        sa.Column("archived_at", sa.TIMESTAMP(timezone=True), nullable=True, comment="Дата архивации"),
         sa.Column(
-            "created_at", sa.TIMESTAMP(), server_default=sa.text("now()"), nullable=False, comment="Дата создания"
+            "created_at",
+            sa.TIMESTAMP(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Дата создания",
         ),
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False, comment="Идентификатор"
@@ -459,8 +474,8 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=100), nullable=False, comment="Название спринта"),
         sa.Column("description", sa.String(), nullable=False, comment="Описание/цель спринта"),
         sa.Column("project_id", sa.Uuid(), nullable=False, comment="Идентификатор проекта"),
-        sa.Column("start_date", sa.TIMESTAMP(), nullable=True, comment="Время начала спринта"),
-        sa.Column("end_date", sa.TIMESTAMP(), nullable=True, comment="Время завершения спринта"),
+        sa.Column("start_date", sa.TIMESTAMP(timezone=True), nullable=True, comment="Время начала спринта"),
+        sa.Column("end_date", sa.TIMESTAMP(timezone=True), nullable=True, comment="Время завершения спринта"),
         sa.Column(
             "status",
             sa.Enum("Планирование", "Активный", "Завершенный", name="sprint_status"),
@@ -595,12 +610,18 @@ def upgrade() -> None:
         sa.Column("column_id", sa.Uuid(), nullable=True, comment="Идентификатор столбца"),
         sa.Column("project_id", sa.Uuid(), nullable=False, comment="Идентификатор проекта"),
         sa.Column("color", sa.String(length=9), nullable=False, comment="Цвет задачи"),
-        sa.Column("deadline", sa.TIMESTAMP(), nullable=True, comment="Выполнить до"),
+        sa.Column("deadline", sa.TIMESTAMP(timezone=True), nullable=True, comment="Выполнить до"),
         sa.Column("task_type_id", sa.BIGINT(), nullable=False, comment="Идентификатор типа задачи"),
-        sa.Column("created_at", sa.TIMESTAMP(), server_default=sa.text("now()"), nullable=False, comment="Создана"),
-        sa.Column("updated_at", sa.TIMESTAMP(), nullable=True, comment="Обновлена"),
-        sa.Column("completed_at", sa.TIMESTAMP(), nullable=True, comment="Выполнена"),
-        sa.Column("archived_at", sa.TIMESTAMP(), nullable=True, comment="Архивирована"),
+        sa.Column(
+            "created_at",
+            sa.TIMESTAMP(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Создана",
+        ),
+        sa.Column("updated_at", sa.TIMESTAMP(timezone=True), nullable=True, comment="Обновлена"),
+        sa.Column("completed_at", sa.TIMESTAMP(timezone=True), nullable=True, comment="Выполнена"),
+        sa.Column("archived_at", sa.TIMESTAMP(timezone=True), nullable=True, comment="Архивирована"),
         sa.Column(
             "archived_by_id", sa.Uuid(), nullable=True, comment="Идентификатор пользователя архивировавшего задачу"
         ),
@@ -717,19 +738,9 @@ def upgrade() -> None:
         sa.UniqueConstraint("task_comment_id", "file_id", name="uq_comment_attachment"),
         comment="Файлы прикрепленные к комментариям",
     )
-
     op.create_foreign_key(
         "fk_messages_thread_id_threads", "messages", "threads", ["thread_id"], ["id"], ondelete="CASCADE"
     )
-    op.create_foreign_key(
-        "fk_threads_parent_message_id_messages",
-        "threads",
-        "messages",
-        ["parent_message_id"],
-        ["id"],
-        ondelete="SET DEFAULT",
-    )
-
     # ### end Alembic commands ###
 
 
@@ -761,6 +772,7 @@ def downgrade() -> None:
     op.drop_table("channels")
     op.drop_table("user_company_membership")
     op.drop_table("subject_permissions_to_object")
+    op.drop_table("smiles")
     op.drop_table("roles")
     op.drop_table("logs")
     op.drop_table("icons")
