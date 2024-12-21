@@ -1,6 +1,6 @@
 from app.db.models.base import Base
 from app.db.models.boards import Board, BoardColumn, BoardsTemplatesColumns, BoardTemplate
-from app.db.models.chats import Channel, ChannelsGroup, LastReadMessageByUser, Message
+from app.db.models.chats import Channel, ChannelsGroup, LastReadMessageByUser, Message, Thread
 from app.db.models.classifiers import (
     ContextType,
     EventType,
@@ -8,6 +8,7 @@ from app.db.models.classifiers import (
     Permission,
     ProjectType,
     Role,
+    Smile,
     TaskLinkType,
     TaskType,
     Timezone,
@@ -64,4 +65,6 @@ __all__ = [
     "TaskComment",
     "User",
     "UserCompanyMembership",
+    "Thread",
+    "Smile",
 ]

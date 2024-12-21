@@ -157,3 +157,15 @@ class TaskLinkType(Base, SmallIntPrimaryKeyMixin):
 
     def __repr__(self):
         return f"<TaskLinkType {self.status} - {self.invert_status}>"
+
+
+class Smile(Base, BigIntPrimaryKeyMixin):
+    """Модель для хранения смайлов."""
+
+    __tablename__ = "smiles"
+
+    company_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор компании"
+    )
+    code: Mapped[str] = mapped_column(String(30), comment="Код смайлика")
+    filename: Mapped[str] = mapped_column(comment="Имя файла")
