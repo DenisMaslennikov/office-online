@@ -147,3 +147,15 @@ class Thread(Base, BigIntPrimaryKeyMixin):
     channel_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
     )
+
+
+class Smile(Base, BigIntPrimaryKeyMixin):
+    """Модель для хранения смайлов."""
+
+    __tablename__ = "smiles"
+
+    company_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), comment="Идентификатор компании"
+    )
+    code: Mapped[str] = mapped_column(String(30), comment="Код смайлика")
+    filename: Mapped[str] = mapped_column(comment="Имя файла")
