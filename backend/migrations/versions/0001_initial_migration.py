@@ -25,7 +25,7 @@ def upgrade() -> None:
         "context_types",
         sa.Column("system_name", sa.String(length=20), nullable=False, comment="Системное имя контекста"),
         sa.Column(
-            "display_name", sa.String(length=20), nullable=False, comment="Имя контекста для отображения пользователю"
+            "display_name", sa.String(length=20), nullable=True, comment="Имя контекста для отображения пользователю"
         ),
         sa.Column("id", sa.SMALLINT(), nullable=False, comment="Идентификатор"),
         sa.PrimaryKeyConstraint("id"),
