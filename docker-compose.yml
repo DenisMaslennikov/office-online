@@ -19,8 +19,30 @@ services:
       - "./backend:/backend/"
       - uploads:/uploads
     depends_on:
-      - db
+      db:
+        condition: service_started
+      migrations:
+        condition: service_completed_successfully
     restart: always
+
+  migrations:
+    build:
+      context: .
+      dockerfile: docker/dev/api/Dockerfile
+    command: python3 alembic_upgrade_head.py
+    env_file: config/.env
+    volumes:
+      - "./backend:/backend/"
+    depends_on:
+      - db
+
+  redis:
+    image: redis
+    restart: always
+    volumes:
+      - ./redis/data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
 
 volumes:
   pgdata:
