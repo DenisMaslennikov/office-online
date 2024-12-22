@@ -76,7 +76,7 @@ class UsersSettings(BaseModel):
     """Настройки пользователей."""
 
     # Интервал времени для удаления пользователя
-    # TODO Написать задачу для Celery для удаления файлов из корзины
+    # TODO Написать задачу для Celery для удаления пользователя
     user_deletion_timedelta: timedelta = timedelta(days=30)
 
 
@@ -84,8 +84,8 @@ class CompaniesSettings(BaseModel):
     """Настройки компании."""
 
     # Интервал времени для удаления компании
-    # TODO Написать задачу для Celery для удаления пользователя
-    user_deletion_timedelta: timedelta = timedelta(days=30)
+    # TODO Написать задачу для Celery для удаления компании
+    company_deletion_timedelta: timedelta = timedelta(days=30)
 
 
 class Settings(BaseSettings):
