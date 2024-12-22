@@ -19,6 +19,7 @@ bcrypt = "^4.2.1"
 python-multipart = "^0.0.19"
 aiofiles = "^24.1.0"
 aioredis = "^2.0.1"
+orjson = "^3.10.12"
 
 
 [tool.poetry.group.dev.dependencies]
