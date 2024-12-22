@@ -39,7 +39,7 @@ async def create_user_repo(
     return user
 
 
-async def get_user_by_email_repo(session: AsyncSession, email: str, *option: list[_AbstractLoad]) -> User | None:
+async def get_user_by_email_repo(session: AsyncSession, email: str, *option: _AbstractLoad) -> User | None:
     """Получает пользователя по его email."""
     stmt = select(User).where(User.email == email)
     if option:
@@ -52,7 +52,7 @@ async def get_user_by_email_or_username_repo(
     session: AsyncSession,
     email: str,
     username: str,
-    *option: list[_AbstractLoad],
+    *option: _AbstractLoad,
 ) -> User | None:
     """Получает пользователя по его email или username."""
     stmt = select(User).where(or_(User.email == email, User.username == username))

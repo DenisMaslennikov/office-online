@@ -3,7 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
+from app.config import settings
 from app.api.v1.auth.jwt import create_access_token, create_refresh_token, decode_token
 from app.api.v1.dependencies.users import auth_user, get_user_from_refresh_token, get_current_user
 from app.api.v1.users import crud
@@ -12,10 +14,12 @@ from app.api.v1.users.schemas import (
     JWTTokensPairWithTokenTypeSchema,
     TokenValidationResultSchema,
     UserResponseSchema,
+    UserCashSchema,
 )
 from app.constants import DEFAULT_RESPONSES
 from app.db import db_helper
 from app.db.models import User
+from app.utils.redis import update_cash
 
 router = APIRouter(tags=["Users"])
 
@@ -80,7 +84,7 @@ async def user_register(
     phone: Annotated[str | None, Form()] = None,
     image: Annotated[UploadFile | None, File()] = None,
     timezone_id: Annotated[int | None, Form()] = None,
-) -> User:
+) -> UserCashSchema:
     """Создание нового пользователя."""
     user_from_bd = await crud.get_user_by_email_or_username_repo(session, email, username)
     if user_from_bd is not None:
@@ -98,10 +102,12 @@ async def user_register(
         image=image,
         timezone_id=timezone_id,
     )
-    return user
+    response = UserCashSchema.model_validate(user)
+    await update_cash(settings.redis.user_prefix, response)
+    return response
 
 
 @router.get("/me/", response_model=UserResponseSchema, responses=DEFAULT_RESPONSES)
-async def get_user_me(user: Annotated[User, Depends(get_current_user)]) -> User:
+async def get_user_me(user: Annotated[UserCashSchema, Depends(get_current_user)]) -> UserCashSchema:
     """Получение информации о текущем пользователе."""
     return user

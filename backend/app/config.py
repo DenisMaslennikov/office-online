@@ -47,6 +47,15 @@ class DataBaseSettings(BaseModel):
         )
 
 
+class RedisSettings(BaseModel):
+    """Настройки Redis."""
+
+    host: str
+    port: str
+
+    user_prefix: str = "user"
+
+
 class JWTSettings(BaseModel):
     """Конфигурация настроек безопасности."""
 
@@ -98,6 +107,10 @@ class Settings(BaseSettings):
 
     # Настройки подключения к базе данных
     db: DataBaseSettings
+
+    # Настройки Redis.
+    redis: RedisSettings
+
     # Надо ли отслеживать изменения в файлах и перезапускать uvicorn
     reload: bool = True
     debug: bool

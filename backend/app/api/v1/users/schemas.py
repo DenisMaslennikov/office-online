@@ -13,8 +13,8 @@ class UserLoginSchema(BaseModel):
     password: str = Field(..., examples=["password"])
 
 
-class UserResponseSchema(BaseModel):
-    """Сериализатор пользователя для операций чтения."""
+class BaseUserSchema(BaseModel):
+    """Базовая модель пользователя."""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -23,9 +23,22 @@ class UserResponseSchema(BaseModel):
     username: str
     display_name: str | None
     phone: str | None
+    image: str | None
+    is_bot: bool
+
+
+class UserCashSchema(BaseUserSchema):
+    """Сериализатор для кеширования пользователя."""
+
+    active: bool
+    timezone: TimezoneReadSchema | None
+
+
+class UserResponseSchema(BaseUserSchema):
+    """Сериализатор пользователя для операций чтения."""
+
     image: str | None = Field(exclude=True)
     timezone: TimezoneReadSchema | None
-    is_bot: bool
 
     @computed_field
     @property
