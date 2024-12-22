@@ -5,7 +5,7 @@ from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.auth.jwt import create_access_token, create_refresh_token, decode_token
-from app.api.v1.dependencies.users import auth_user, get_user_from_refresh_token
+from app.api.v1.dependencies.users import auth_user, get_user_from_refresh_token, get_current_user
 from app.api.v1.users import crud
 from app.api.v1.users.schemas import (
     JWTTokenForValidationSchema,
@@ -13,6 +13,7 @@ from app.api.v1.users.schemas import (
     TokenValidationResultSchema,
     UserResponseSchema,
 )
+from app.constants import DEFAULT_RESPONSES
 from app.db import db_helper
 from app.db.models import User
 
@@ -97,4 +98,10 @@ async def user_register(
         image=image,
         timezone_id=timezone_id,
     )
+    return user
+
+
+@router.get("/me/", response_model=UserResponseSchema, responses=DEFAULT_RESPONSES)
+async def get_user_me(user: Annotated[User, Depends(get_current_user)]) -> User:
+    """Получение информации о текущем пользователе."""
     return user

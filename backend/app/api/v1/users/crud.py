@@ -53,14 +53,11 @@ async def get_user_by_email_or_username_repo(
     email: str,
     username: str,
     *option: list[_AbstractLoad],
-    exclude_user_id: UUID | str = None,
 ) -> User | None:
     """Получает пользователя по его email или username."""
     stmt = select(User).where(or_(User.email == email, User.username == username))
     if option:
         stmt = stmt.options(*option)
-    if exclude_user_id:
-        stmt = stmt.where(User.id != exclude_user_id)
     results: Result = await session.execute(stmt)
     return results.scalars().first()
 
