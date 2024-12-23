@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2024-12-21 13:04:46.458894
+Create Date: 2024-12-23 10:23:36.966479
 
 """
 
@@ -71,7 +71,10 @@ def upgrade() -> None:
         sa.Column("timezone_id", sa.SMALLINT(), nullable=False, comment="Идентификатор таймзоны"),
         sa.Column("logo", sa.String(), nullable=True, comment="Логотип организации"),
         sa.Column(
-            "scheduled_deletion_date", sa.TIMESTAMP(), nullable=True, comment="Дата запланированного удаления компании"
+            "scheduled_deletion_date",
+            sa.TIMESTAMP(timezone=True),
+            nullable=True,
+            comment="Дата запланированного удаления компании",
         ),
         sa.Column("active", sa.Boolean(), server_default=sa.text("true"), nullable=False, comment="Компания активна"),
         sa.Column(
@@ -113,7 +116,12 @@ def upgrade() -> None:
         sa.Column(
             "active", sa.Boolean(), server_default="true", nullable=False, comment="Активен ли аккаунт пользователя"
         ),
-        sa.Column("scheduled_deletion_date", sa.TIMESTAMP(), nullable=True, comment="Запланированная дата удаления"),
+        sa.Column(
+            "scheduled_deletion_date",
+            sa.TIMESTAMP(timezone=True),
+            nullable=True,
+            comment="Запланированная дата удаления",
+        ),
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False, comment="Идентификатор"
         ),
@@ -286,12 +294,14 @@ def upgrade() -> None:
         sa.Column("user_id", sa.Uuid(), nullable=False, comment="Идентификатор пользователя"),
         sa.Column(
             "created_at",
-            sa.TIMESTAMP(),
+            sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
             comment="Время создания сообщения",
         ),
-        sa.Column("updated_at", sa.TIMESTAMP(), nullable=True, comment="Время последнего изменения сообщения"),
+        sa.Column(
+            "updated_at", sa.TIMESTAMP(timezone=True), nullable=True, comment="Время последнего изменения сообщения"
+        ),
         sa.Column("quoted_message_id", sa.BIGINT(), nullable=False, comment="Идентификатор цитируемого сообщения"),
         sa.Column(
             "is_deleted",
@@ -313,7 +323,7 @@ def upgrade() -> None:
         sa.Column("title", sa.String(), nullable=False, comment="Заголовок треда"),
         sa.Column(
             "created_at",
-            sa.TIMESTAMP(),
+            sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
             comment="Время создания треда",
@@ -442,7 +452,7 @@ def upgrade() -> None:
         sa.Column("files_group_id", sa.Uuid(), nullable=False, comment="Идентификатор группы файлов"),
         sa.Column(
             "created_at",
-            sa.TIMESTAMP(),
+            sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
             comment="Время добавления файла в группу",
@@ -680,13 +690,16 @@ def upgrade() -> None:
         sa.Column("content", sa.String(), nullable=False, comment="Содержание комментария"),
         sa.Column(
             "created_at",
-            sa.TIMESTAMP(),
+            sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
             comment="Дата и время создания комментария",
         ),
         sa.Column(
-            "updated_at", sa.TIMESTAMP(), nullable=True, comment="Дата и время последнего обновления комментария"
+            "updated_at",
+            sa.TIMESTAMP(timezone=True),
+            nullable=True,
+            comment="Дата и время последнего обновления комментария",
         ),
         sa.Column(
             "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False, comment="Идентификатор"

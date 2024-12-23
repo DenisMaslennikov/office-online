@@ -1,8 +1,8 @@
-"""fix_smallint_pk_types
+"""change_integer_to_smallint
 
 Revision ID: 0002
 Revises: 0001
-Create Date: 2024-12-21 13:14:30.068824
+Create Date: 2024-12-23 10:26:54.072001
 
 """
 from typing import Sequence, Union
@@ -52,8 +52,7 @@ def upgrade() -> None:
                type_=sa.SMALLINT(),
                existing_comment='Идентификатор',
                existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text("nextval('task_link_types_id_seq'::regclass)"))
+               autoincrement=True)
     op.alter_column('timezones', 'id',
                existing_type=sa.INTEGER(),
                type_=sa.SMALLINT(),
@@ -78,8 +77,7 @@ def downgrade() -> None:
                type_=sa.INTEGER(),
                existing_comment='Идентификатор',
                existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text("nextval('task_link_types_id_seq'::regclass)"))
+               autoincrement=True)
     op.alter_column('project_types', 'id',
                existing_type=sa.SMALLINT(),
                type_=sa.INTEGER(),
