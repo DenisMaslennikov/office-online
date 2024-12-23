@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
@@ -5,21 +6,23 @@ from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.config import settings
 from app.api.v1.auth.jwt import create_access_token, create_refresh_token, decode_token
-from app.api.v1.dependencies.users import auth_user, get_user_from_refresh_token, get_current_user
+from app.api.v1.dependencies.jwt import get_current_user_id
+from app.api.v1.dependencies.users import auth_user, get_current_user, get_user_from_refresh_token
 from app.api.v1.users import crud
 from app.api.v1.users.schemas import (
     JWTTokenForValidationSchema,
     JWTTokensPairWithTokenTypeSchema,
     TokenValidationResultSchema,
-    UserResponseSchema,
     UserCashSchema,
+    UserResponseSchema,
+    UserWithoutTimezoneSchema,
 )
+from app.config import settings
 from app.constants import DEFAULT_RESPONSES
 from app.db import db_helper
 from app.db.models import User
-from app.utils.redis import update_cash
+from app.db.redis import delete_from_cache, update_cache
 
 router = APIRouter(tags=["Users"])
 
@@ -48,7 +51,7 @@ async def create_tokens(user: Annotated[User, Depends(auth_user)]) -> JWTTokensP
     },
 )
 async def tokens_refresh(
-    user: Annotated[User, Depends(get_user_from_refresh_token)]
+    user: Annotated[User | UserCashSchema, Depends(get_user_from_refresh_token)]
 ) -> JWTTokensPairWithTokenTypeSchema:
     """Обновление токенов по refresh токену."""
     return JWTTokensPairWithTokenTypeSchema(
@@ -103,11 +106,61 @@ async def user_register(
         timezone_id=timezone_id,
     )
     response = UserCashSchema.model_validate(user)
-    await update_cash(settings.redis.user_prefix, response)
+    await update_cache(settings.redis.user_prefix, response)
     return response
 
 
 @router.get("/me/", response_model=UserResponseSchema, responses=DEFAULT_RESPONSES)
 async def get_user_me(user: Annotated[UserCashSchema, Depends(get_current_user)]) -> UserCashSchema:
     """Получение информации о текущем пользователе."""
+    return user
+
+
+@router.delete("/me/", response_model=UserWithoutTimezoneSchema, responses=DEFAULT_RESPONSES)
+async def delete_user_me(
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
+    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+) -> User:
+    """Удаление текущего авторизированного пользователя."""
+    user = await crud.schedule_user_deletion(session, user_id)
+    await delete_from_cache(settings.redis.user_prefix, user.id)
+    return user
+
+
+@router.post("/cancel_deletion_me/", response_model=UserWithoutTimezoneSchema, responses=DEFAULT_RESPONSES)
+async def cancel_deletion_user_me(
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
+    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+) -> User:
+    """Отменяет запланированное удаление пользователя."""
+    user = await crud.cancel_user_deletion(session, user_id)
+    await delete_from_cache(settings.redis.user_prefix, user.id)
+    return user
+
+
+@router.patch("/me/", response_model=UserResponseSchema, responses=DEFAULT_RESPONSES)
+async def partial_update_user_me(
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
+    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+    email: Annotated[EmailStr | None, Form()] = None,
+    username: Annotated[str | None, Form()] = None,
+    display_name: Annotated[str | None, Form()] = None,
+    phone: Annotated[str | None, Form()] = None,
+    image: Annotated[UploadFile | None, File()] = None,
+    timezone_id: Annotated[int | None, Form()] = None,
+) -> User:
+    """Частичное обновление информации о пользователе."""
+    user = await crud.get_user_by_id_repo(session, user_id, joinedload(User.timezone))
+    user = await crud.update_user_repo(
+        session,
+        user,
+        email=email,
+        username=username,
+        display_name=display_name,
+        phone=phone,
+        image=image,
+        timezone_id=timezone_id,
+    )
+    user_cash_schema = UserCashSchema.model_validate(user)
+    await update_cache(settings.redis.user_prefix, user_cash_schema)
     return user
