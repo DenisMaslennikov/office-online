@@ -45,3 +45,6 @@ DEFAULT_RESPONSES = {
     status.HTTP_403_FORBIDDEN: {"description": "Пользователь не активен или недостаточно прав"},
     status.HTTP_404_NOT_FOUND: {"description": "Пользователь не найден"},
 }
+
+# Типы файлов
+USER_IMAGE = "USER_IMAGE"
