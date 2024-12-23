@@ -142,7 +142,10 @@ class Thread(Base, BigIntPrimaryKeyMixin):
     )
     title: Mapped[str] = mapped_column(comment="Заголовок треда")
     created_at: Mapped[datetime.datetime] = mapped_column(
-        TIMESTAMP(timezone=True), server_default=func.now(), default=datetime.datetime.now, comment="Время создания треда"
+        TIMESTAMP(timezone=True),
+        server_default=func.now(),
+        default=datetime.datetime.now,
+        comment="Время создания треда",
     )
     channel_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"
