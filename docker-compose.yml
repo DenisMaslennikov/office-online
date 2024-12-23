@@ -40,10 +40,11 @@ services:
     image: redis
     restart: always
     volumes:
-      - ./redis/data:/data
+      - redisdata:/data
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
 
 volumes:
   pgdata:
   uploads:
+  redisdata:
