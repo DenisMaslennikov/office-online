@@ -1,3 +1,4 @@
+import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
@@ -18,27 +19,21 @@ class BaseUserSchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: UUID
     email: EmailStr
     username: str
     display_name: str | None
     phone: str | None
     image: str | None
-    is_bot: bool
 
 
-class UserCashSchema(BaseUserSchema):
-    """Сериализатор для кеширования пользователя."""
+class UserWithoutTimezoneSchema(BaseUserSchema):
+    """Сериализатор пользователя без информации о его часовом поясе."""
 
-    active: bool
-    timezone: TimezoneReadSchema | None
-
-
-class UserResponseSchema(BaseUserSchema):
-    """Сериализатор пользователя для операций чтения."""
-
+    id: UUID
     image: str | None = Field(exclude=True)
-    timezone: TimezoneReadSchema | None
+    is_bot: bool
+    active: bool
+    scheduled_deletion_date: datetime.datetime | None
 
     @computed_field
     @property
@@ -47,6 +42,22 @@ class UserResponseSchema(BaseUserSchema):
         if self.image is None:
             return None
         return f"{settings.files_urls.users_images_url}{self.image}"
+
+
+class UserCashSchema(BaseUserSchema):
+    """Сериализатор для кеширования пользователя."""
+
+    id: UUID
+    active: bool
+    timezone: TimezoneReadSchema | None
+    is_bot: bool
+    scheduled_deletion_date: datetime.datetime | None
+
+
+class UserResponseSchema(UserWithoutTimezoneSchema):
+    """Сериализатор пользователя для операций чтения."""
+
+    timezone: TimezoneReadSchema | None
 
 
 class JWTTokensPairBaseSchema(BaseModel):
