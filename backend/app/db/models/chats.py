@@ -84,10 +84,10 @@ class Message(Base, BigIntPrimaryKeyMixin):
         default=DELETED_USER_ID,
     )
     created_at: Mapped[datetime.datetime] = mapped_column(
-        TIMESTAMP, server_default=func.now(), comment="Время создания сообщения"
+        TIMESTAMP(timezone=True), server_default=func.now(), comment="Время создания сообщения"
     )
     updated_at: Mapped[datetime.datetime | None] = mapped_column(
-        TIMESTAMP, comment="Время последнего изменения сообщения"
+        TIMESTAMP(timezone=True), comment="Время последнего изменения сообщения"
     )
     quoted_message_id: Mapped[int] = mapped_column(
         BIGINT,
@@ -142,7 +142,7 @@ class Thread(Base, BigIntPrimaryKeyMixin):
     )
     title: Mapped[str] = mapped_column(comment="Заголовок треда")
     created_at: Mapped[datetime.datetime] = mapped_column(
-        TIMESTAMP, server_default=func.now(), default=datetime.datetime.now, comment="Время создания треда"
+        TIMESTAMP(timezone=True), server_default=func.now(), default=datetime.datetime.now, comment="Время создания треда"
     )
     channel_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("channels.id", ondelete="CASCADE"), comment="Идентификатор канала"

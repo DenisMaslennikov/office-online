@@ -83,7 +83,7 @@ class FileInGroup(Base, BigIntPrimaryKeyMixin):
         ForeignKey("files_groups.id", ondelete="CASCADE"), comment="Идентификатор группы файлов"
     )
     created_at: Mapped[datetime.datetime] = mapped_column(
-        TIMESTAMP, comment="Время добавления файла в группу", server_default=func.now()
+        TIMESTAMP(timezone=True), comment="Время добавления файла в группу", server_default=func.now()
     )
 
     def __repr__(self):

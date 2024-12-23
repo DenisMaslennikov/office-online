@@ -22,7 +22,7 @@ class Company(Base, UUIDPrimaryKeyMixin):
     )
     logo: Mapped[str | None] = mapped_column(comment="Логотип организации")
     scheduled_deletion_date: Mapped[datetime.datetime | None] = mapped_column(
-        TIMESTAMP, comment="Дата запланированного удаления компании"
+        TIMESTAMP(timezone=True), comment="Дата запланированного удаления компании"
     )
     active: Mapped[bool] = mapped_column(comment="Компания активна", default=True, server_default=text("true"))
 

@@ -35,7 +35,7 @@ class User(Base, UUIDPrimaryKeyMixin):
     )
     active: Mapped[bool] = mapped_column(comment="Активен ли аккаунт пользователя", default=True, server_default="true")
     scheduled_deletion_date: Mapped[datetime.datetime | None] = mapped_column(
-        TIMESTAMP, comment="Запланированная дата удаления"
+        TIMESTAMP(timezone=True), comment="Запланированная дата удаления"
     )
 
     timezone: Mapped["Timezone"] = relationship()

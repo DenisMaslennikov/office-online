@@ -89,10 +89,10 @@ class TaskComment(Base, UUIDPrimaryKeyMixin):
     )
     content: Mapped[str] = mapped_column(comment="Содержание комментария")
     created_at: Mapped[datetime.datetime] = mapped_column(
-        TIMESTAMP, comment="Дата и время создания комментария", server_default=func.now()
+        TIMESTAMP(timezone=True), comment="Дата и время создания комментария", server_default=func.now()
     )
     updated_at: Mapped[datetime.datetime | None] = mapped_column(
-        TIMESTAMP, comment="Дата и время последнего обновления комментария"
+        TIMESTAMP(timezone=True), comment="Дата и время последнего обновления комментария"
     )
 
     def __repr__(self):
