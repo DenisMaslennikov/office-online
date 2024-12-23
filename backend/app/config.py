@@ -1,4 +1,3 @@
-import os.path
 from datetime import timedelta
 from pathlib import Path
 

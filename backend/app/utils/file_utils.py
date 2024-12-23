@@ -2,10 +2,9 @@ import os
 import uuid
 
 import aiofiles
-from fastapi import UploadFile, HTTPException, status
+from fastapi import HTTPException, UploadFile, status
 
 from app.config import settings
-from app.constants import USER_IMAGE
 
 
 async def save_file(uploaded_file: UploadFile, destination: os.PathLike) -> str:

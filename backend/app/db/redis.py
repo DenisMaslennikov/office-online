@@ -1,9 +1,9 @@
 import uuid
 from typing import Type
 
-from redis.asyncio import Redis
-from pydantic import BaseModel
 import orjson
+from pydantic import BaseModel
+from redis.asyncio import Redis
 
 from app.config import settings
 
