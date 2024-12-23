@@ -1,3 +1,4 @@
+import os.path
 from datetime import timedelta
 from pathlib import Path
 
@@ -70,8 +71,10 @@ class JWTSettings(BaseModel):
 class FilesSettings(BaseModel):
     """Настройки хранения файлов."""
 
-    uploads_path: str
-    users_images_path: str
+    uploads_path: Path = BASE_DIR.parent / "uploads"
+    users_images_path: Path = uploads_path / "users" / "images"
+    user_image_maximum_size: int = 1024 * 1024 * 8  # 8MB
+    user_image_allowed_file_types: list[str] = ["png", "jpg", "jpeg", "gif"]
 
 
 class FilesUrlsSettings(BaseModel):
@@ -116,7 +119,7 @@ class Settings(BaseSettings):
     debug: bool
 
     # Хранение файлов.
-    files: FilesSettings
+    files: FilesSettings = FilesSettings()
 
     # Раздача файлов через Nginx
     files_urls: FilesUrlsSettings
