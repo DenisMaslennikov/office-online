@@ -53,7 +53,10 @@ class RedisSettings(BaseModel):
     host: str
     port: str
 
+    global_ttl: int = 3600
+
     user_prefix: str = "user"
+    user_ttl: int | None = None
 
 
 class JWTSettings(BaseModel):

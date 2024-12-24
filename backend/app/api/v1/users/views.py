@@ -106,7 +106,7 @@ async def user_register(
         timezone_id=timezone_id,
     )
     response = UserCashSchema.model_validate(user)
-    await update_cache(settings.redis.user_prefix, response)
+    await update_cache(settings.redis.user_prefix, response, settings.redis.user_ttl or settings.redis.global_ttl)
     return response
 
 
@@ -162,5 +162,7 @@ async def partial_update_user_me(
         timezone_id=timezone_id,
     )
     user_cash_schema = UserCashSchema.model_validate(user)
-    await update_cache(settings.redis.user_prefix, user_cash_schema)
+    await update_cache(
+        settings.redis.user_prefix, user_cash_schema, settings.redis.user_ttl or settings.redis.global_ttl
+    )
     return user

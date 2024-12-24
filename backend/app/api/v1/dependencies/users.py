@@ -48,7 +48,7 @@ async def get_current_user(
 
     user_from_db = await crud.get_user_by_id_repo(session, user_id, joinedload(User.timezone))
     user = UserCashSchema.model_validate(user_from_db)
-    await update_cache(settings.redis.user_prefix, user)
+    await update_cache(settings.redis.user_prefix, user, settings.redis.user_ttl or settings.redis.global_ttl)
 
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
