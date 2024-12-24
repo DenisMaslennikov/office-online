@@ -10,7 +10,7 @@ from app.config import settings
 redis_client = Redis(host=settings.redis.host, port=settings.redis.port, decode_responses=True)
 
 
-async def update_cache(prefix: str, schema: BaseModel, ttl: int = settings.redis.global_ttl) -> None:
+async def update_cache(prefix: str, schema: BaseModel, ttl: int | None = None) -> None:
     """Обновляет кеш redis."""
     await redis_client.set(f"{prefix}:{schema.id}", schema.model_dump_json(), ex=ttl)
 
