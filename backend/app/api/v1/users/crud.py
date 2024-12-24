@@ -124,7 +124,7 @@ async def update_user_repo(
 
 
 async def cancel_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> User:
-    """Отменет удаление пользователя."""
+    """Отменяет удаление пользователя."""
     stmt = (
         update(User)
         .where(User.id == user_id)
