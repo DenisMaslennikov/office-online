@@ -1,5 +1,5 @@
 import uuid
-from typing import Type
+from typing import Type, Any
 
 import orjson
 from pydantic import BaseModel
@@ -26,12 +26,18 @@ async def get_object_from_cache(prefix: str, id: str | uuid.UUID | int, model: T
     return model(**data)
 
 
-async def get_raw_data_from_cache(prefix: str, id: str | uuid.UUID | int) -> dict | list | None:
+async def get_raw_data_from_cache(prefix: str, id: str | uuid.UUID | int) -> Any:
     """Получение сырых данных из кеша Redis."""
     redis_data = await redis_client.get(f"{prefix}:{id}")
     if redis_data is None:
         return None
     return orjson.loads(redis_data)
+
+
+async def update_raw_data_cache(prefix: str, key: Any, value: Any) -> None:
+    """Записывает сырые данные по ключу с префиксом."""
+    await redis_client.set(f"{prefix}:{key}", orjson.dumps(value), ex=get_ttl_by_prefix(prefix))
+
 
 
 async def delete_from_cache(prefix: str, id: str | uuid.UUID | int) -> None:
