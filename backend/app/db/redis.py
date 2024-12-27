@@ -10,9 +10,9 @@ from app.config import settings
 redis_client = Redis(host=settings.redis.host, port=settings.redis.port, decode_responses=True)
 
 
-async def update_object_cache(prefix: str, schema: BaseModel, ttl: int | None = None) -> None:
+async def update_object_cache(prefix: str, schema: BaseModel) -> None:
     """Обновляет кеш redis."""
-    await redis_client.set(f"{prefix}:{schema.id}", schema.model_dump_json(), ex=ttl)
+    await redis_client.set(f"{prefix}:{schema.id}", schema.model_dump_json(), ex=get_ttl_by_prefix(prefix))
 
 
 async def get_object_from_cache(prefix: str, id: str | uuid.UUID | int, model: Type[BaseModel]) -> BaseModel | None:
@@ -37,3 +37,8 @@ async def get_raw_data_from_cache(prefix: str, id: str | uuid.UUID | int) -> dic
 async def delete_from_cache(prefix: str, id: str | uuid.UUID | int) -> None:
     """Удаляет значение из кеша Redis."""
     await redis_client.delete(f"{prefix}:{id}")
+
+
+def get_ttl_by_prefix(prefix: str) -> int | None:
+    """Получение времени жизни по префиксу."""
+    return settings.redis.ttl_override.get(prefix) or settings.redis.default_ttl
