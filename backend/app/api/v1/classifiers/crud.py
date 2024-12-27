@@ -4,7 +4,7 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import settings
+from app.config import settings
 from app.api.v1.classifiers.schemas import TimezoneCacheSchema
 from app.db.models import Timezone
 from app.db.redis import get_object_from_cache, update_object_cache
