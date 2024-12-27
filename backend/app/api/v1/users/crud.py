@@ -61,8 +61,8 @@ async def get_user_by_email(session: AsyncSession, email: str, with_tz: bool = F
 
 async def get_user_by_email_or_username_from_db(
     session: AsyncSession,
-    email: str,
-    username: str,
+    email: str | None = None,
+    username: str | None = None,
     with_tz: bool = False,
     exclude_id: str | UUID | None = None,
 ) -> User | None:

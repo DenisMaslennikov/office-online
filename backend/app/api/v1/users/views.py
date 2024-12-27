@@ -13,6 +13,7 @@ from app.api.v1.dependencies.users import (
     get_current_user_with_tz,
 )
 from app.api.v1.users import crud
+from app.api.v1.users.crud import get_user_by_email
 from app.api.v1.users.schemas import (
     JWTTokenForValidationSchema,
     JWTTokensPairWithTokenTypeSchema,
@@ -151,6 +152,14 @@ async def partial_update_user_me(
 ) -> UserReadTZSchema:
     """Частичное обновление информации о пользователе."""
     user = await crud.get_user_by_id(session, user_id, with_tz=False, cache=False)
+    if email is not None:
+        user_check = await crud.get_user_by_email_or_username_from_db(session, email=email, exclude_id=user_id)
+        if user_check is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Такой email уже зарегистрирован")
+    if username is not None:
+        user_check = await crud.get_user_by_email_or_username_from_db(session, username=username, exclude_id=user_id)
+        if user_check is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Такой username уже зарегистрирован")
     user = await crud.update_user_repo(
         session,
         user,
