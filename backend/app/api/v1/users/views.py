@@ -9,7 +9,8 @@ from sqlalchemy.orm import joinedload
 from app.api.v1.auth.jwt import create_access_token, create_refresh_token, decode_token
 from app.api.v1.classifiers.crud import get_timezone_by_id
 from app.api.v1.dependencies.jwt import get_current_user_id
-from app.api.v1.dependencies.users import auth_user, get_current_user, get_user_from_refresh_token
+from app.api.v1.dependencies.users import auth_user, get_current_user, get_user_from_refresh_token, \
+    get_current_user_with_tz
 from app.api.v1.users import crud
 from app.api.v1.users.schemas import (
     JWTTokenForValidationSchema,
@@ -112,7 +113,7 @@ async def user_register(
 
 
 @router.get("/me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
-async def get_user_me(user: Annotated[UserCashSchema, Depends(get_current_user)]) -> UserCashSchema:
+async def get_user_me(user: Annotated[UserReadTZSchema, Depends(get_current_user_with_tz)]) -> UserReadTZSchema:
     """Получение информации о текущем пользователе."""
     return user
 
