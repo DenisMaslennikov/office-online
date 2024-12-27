@@ -56,6 +56,7 @@ class RedisSettings(BaseModel):
     default_ttl: int = None
 
     user_prefix: str = "user"
+    username_prefix: str = "username"
     timezone_prefix: str = "timezone"
 
     ttl_override: dict[str, int | None] = {
