@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 
+from app import db_helper
+from app.api.v1.classifiers.crud import get_timezone_by_id
 from app.api.v1.classifiers.schemas import TimezoneReadSchema
 from app.config import settings
 
@@ -24,16 +26,17 @@ class BaseUserSchema(BaseModel):
     display_name: str | None
     phone: str | None
     image: str | None
+    timezone_id: int | None
+    scheduled_deletion_date: datetime.datetime | None
+    active: bool
+    is_bot: bool
 
 
-class UserWithoutTimezoneSchema(BaseUserSchema):
+class UserWithoutTZSchema(BaseUserSchema):
     """Сериализатор пользователя без информации о его часовом поясе."""
 
     id: UUID
     image: str | None = Field(exclude=True)
-    is_bot: bool
-    active: bool
-    scheduled_deletion_date: datetime.datetime | None
 
     @computed_field
     @property
@@ -48,15 +51,12 @@ class UserCashSchema(BaseUserSchema):
     """Сериализатор для кеширования пользователя."""
 
     id: UUID
-    active: bool
-    timezone: TimezoneReadSchema | None
-    is_bot: bool
-    scheduled_deletion_date: datetime.datetime | None
 
 
-class UserResponseSchema(UserWithoutTimezoneSchema):
-    """Сериализатор пользователя для операций чтения."""
+class UserReadTZSchema(UserWithoutTZSchema):
+    """Сериализатор пользователя для операций чтения с информацией о таймзоне."""
 
+    timezone_id: int | None = Field(exclude=True)
     timezone: TimezoneReadSchema | None
 
 
