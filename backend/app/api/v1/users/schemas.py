@@ -3,8 +3,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 
-from app import db_helper
-from app.api.v1.classifiers.crud import get_timezone_by_id
 from app.api.v1.classifiers.schemas import TimezoneReadSchema
 from app.config import settings
 

@@ -1,4 +1,3 @@
-from email.policy import default
 from typing import Sequence
 
 from sqlalchemy import select
