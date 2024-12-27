@@ -53,13 +53,15 @@ class RedisSettings(BaseModel):
     host: str
     port: str
 
-    global_ttl: int = None
+    default_ttl: int = None
 
     user_prefix: str = "user"
-    user_ttl: int | None = None
+    timezone_prefix: str = "timezone"
 
-    timezone_prefix: str = "timezones"
-    timezone_ttl: int | None = None
+    ttl_override: dict[str, int | None] = {
+        user_prefix: None,
+        timezone_prefix: None,
+    }
 
 
 class JWTSettings(BaseModel):
