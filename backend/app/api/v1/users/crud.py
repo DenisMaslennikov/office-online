@@ -18,7 +18,7 @@ from app.db.redis import get_raw_data_from_cache, update_object_cache
 from app.utils.file_utils import delete_file, save_file, validate_file_extension, validate_file_size
 
 
-async def create_user_repo(
+async def create_user(
     session: AsyncSession,
     email: str,
     username: str,
@@ -27,7 +27,7 @@ async def create_user_repo(
     phone: str | None = None,
     image: UploadFile | None = None,
     timezone_id: int | None = None,
-) -> User:
+) -> UserCashSchema:
     """Создание нового пользователя."""
     user = User(
         email=email,
@@ -43,8 +43,9 @@ async def create_user_repo(
         user.image = await save_file(image, settings.files.users_images_path)
     session.add(user)
     await session.commit()
-    user = await get_user_by_id(session, user.id, joinedload(User.timezone))
-    return user
+    user_cache = UserCashSchema.model_validate(user)
+    await update_object_cache(settings.redis.user_prefix, user_cache)
+    return user_cache
 
 
 async def get_user_by_email_repo(session: AsyncSession, email: str, *option: _AbstractLoad) -> User | None:
@@ -56,16 +57,16 @@ async def get_user_by_email_repo(session: AsyncSession, email: str, *option: _Ab
     return results.scalar()
 
 
-async def get_user_by_email_or_username_repo(
+async def get_user_by_email_or_username_from_db(
     session: AsyncSession,
     email: str,
     username: str,
-    *option: _AbstractLoad,
+    with_tz: bool = False,
 ) -> User | None:
     """Получает пользователя по его email или username."""
     stmt = select(User).where(or_(User.email == email, User.username == username))
-    if option:
-        stmt = stmt.options(*option)
+    if with_tz:
+        stmt = stmt.options(joinedload(User.timezone))
     results: Result = await session.execute(stmt)
     return results.scalars().first()
 
