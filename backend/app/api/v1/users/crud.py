@@ -15,7 +15,7 @@ import app.api.v1.classifiers.crud as classifiers_crud
 from app.config import settings
 from app.constants import USER_IMAGE
 from app.db.models import User
-from app.db.redis import get_raw_data_from_cache, update_object_cache
+from app.db.redis import get_raw_data_from_cache, update_object_cache, update_raw_data_cache, delete_from_cache
 from app.utils.file_utils import delete_file, save_file, validate_file_extension, validate_file_size
 
 
@@ -46,6 +46,7 @@ async def create_user(
     await session.commit()
     user_cache = UserCacheSchema.model_validate(user)
     await update_object_cache(settings.redis.user_prefix, user_cache)
+    await update_raw_data_cache(settings.redis.username_prefix, user_cache.username, str(user_cache.id))
     return user_cache
 
 
@@ -55,8 +56,6 @@ async def get_user_by_email(session: AsyncSession, email: str, with_tz: bool = F
     if with_tz:
         stmt = stmt.options(joinedload(User.timezone_id))
     results = await session.execute(stmt)
-    user_cache = UserCacheSchema.model_validate(results)
-    await update_object_cache(settings.redis.user_prefix, user_cache)
     return results.scalar()
 
 
@@ -65,12 +64,15 @@ async def get_user_by_email_or_username_from_db(
     email: str,
     username: str,
     with_tz: bool = False,
+    exclude_id: str | UUID | None = None,
 ) -> User | None:
     """Получает пользователя по его email или username."""
     stmt = select(User).where(or_(User.email == email, User.username == username))
     if with_tz:
         stmt = stmt.options(joinedload(User.timezone))
-    results: Result = await session.execute(stmt)
+    if exclude_id is not None:
+        stmt = stmt.where(User.id != exclude_id)
+    results = await session.execute(stmt)
     return results.scalars().first()
 
 
@@ -103,6 +105,7 @@ async def get_user_by_id(
 
     user = await _get_user_by_id_from_db(session, user_id, with_tz)
     await update_object_cache(settings.redis.user_prefix, UserCacheSchema.model_validate(user))
+    await update_raw_data_cache(settings.redis.username_prefix, user.username, str(user.id))
     if with_tz:
         user_cache = UserReadTZSchema.model_validate(user)
     else:
@@ -140,6 +143,8 @@ async def update_user_repo(
     if email is not None:
         user.email = email
     if username is not None:
+        await delete_from_cache(settings.redis.username_prefix, user.username)
+        await update_raw_data_cache(settings.redis.username_prefix, username, str(user.id))
         user.username = username
     if display_name is not None:
         user.display_name = display_name
