@@ -39,9 +39,9 @@ async def update_raw_data_cache(prefix: str, key: Any, value: Any) -> None:
     await redis_client.set(f"{prefix}:{key}", orjson.dumps(value), ex=get_ttl_by_prefix(prefix))
 
 
-async def delete_from_cache(prefix: str, id: str | uuid.UUID | int) -> None:
+async def delete_from_cache(prefix: str, key: Any) -> None:
     """Удаляет значение из кеша Redis."""
-    await redis_client.delete(f"{prefix}:{id}")
+    await redis_client.delete(f"{prefix}:{key}")
 
 
 def get_ttl_by_prefix(prefix: str) -> int | None:
