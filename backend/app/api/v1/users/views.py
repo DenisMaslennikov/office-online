@@ -22,7 +22,7 @@ from app.config import settings
 from app.constants import DEFAULT_RESPONSES
 from app.db import db_helper
 from app.db.models import User
-from app.db.redis import delete_from_cache, update_cache
+from app.db.redis import delete_from_cache, update_object_cache
 
 router = APIRouter(tags=["Users"])
 
@@ -106,7 +106,9 @@ async def user_register(
         timezone_id=timezone_id,
     )
     response = UserCashSchema.model_validate(user)
-    await update_cache(settings.redis.user_prefix, response, settings.redis.user_ttl or settings.redis.global_ttl)
+    await update_object_cache(
+        settings.redis.user_prefix, response, settings.redis.user_ttl or settings.redis.global_ttl
+    )
     return response
 
 
@@ -162,7 +164,7 @@ async def partial_update_user_me(
         timezone_id=timezone_id,
     )
     user_cash_schema = UserCashSchema.model_validate(user)
-    await update_cache(
+    await update_object_cache(
         settings.redis.user_prefix, user_cash_schema, settings.redis.user_ttl or settings.redis.global_ttl
     )
     return user

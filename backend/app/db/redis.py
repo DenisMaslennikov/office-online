@@ -10,12 +10,12 @@ from app.config import settings
 redis_client = Redis(host=settings.redis.host, port=settings.redis.port, decode_responses=True)
 
 
-async def update_cache(prefix: str, schema: BaseModel, ttl: int | None = None) -> None:
+async def update_object_cache(prefix: str, schema: BaseModel, ttl: int | None = None) -> None:
     """Обновляет кеш redis."""
     await redis_client.set(f"{prefix}:{schema.id}", schema.model_dump_json(), ex=ttl)
 
 
-async def get_from_cache(prefix: str, id: str | uuid.UUID | int, model: Type[BaseModel]) -> BaseModel | None:
+async def get_object_from_cache(prefix: str, id: str | uuid.UUID | int, model: Type[BaseModel]) -> BaseModel | None:
     """Получение объекта из кеша Redis."""
     redis_data = await redis_client.get(f"{prefix}:{id}")
     if redis_data is None:
@@ -24,6 +24,14 @@ async def get_from_cache(prefix: str, id: str | uuid.UUID | int, model: Type[Bas
     if len(data["id"]) == 36:  # Длина uuid
         data["id"] = uuid.UUID(data["id"])
     return model(**data)
+
+
+async def get_raw_data_from_cache(prefix: str, id: str | uuid.UUID | int) -> dict | list | None:
+    """Получение сырых данных из кеша Redis."""
+    redis_data = await redis_client.get(f"{prefix}:{id}")
+    if redis_data is None:
+        return None
+    return orjson.loads(redis_data)
 
 
 async def delete_from_cache(prefix: str, id: str | uuid.UUID | int) -> None:

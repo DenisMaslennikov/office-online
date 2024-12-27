@@ -11,7 +11,7 @@ from app.api.v1.users.schemas import UserCashSchema, UserLoginSchema
 from app.config import settings
 from app.db import db_helper
 from app.db.models import User
-from app.db.redis import get_from_cache, update_cache
+from app.db.redis import get_object_from_cache, update_object_cache
 
 
 async def user_is_active(user: User | UserCashSchema) -> bool:
@@ -41,14 +41,14 @@ async def get_current_user(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
 ) -> UserCashSchema:
     """Получает текущего пользователя."""
-    user_from_cash = await get_from_cache(settings.redis.user_prefix, user_id, UserCashSchema)
+    user_from_cash = await get_object_from_cache(settings.redis.user_prefix, user_id, UserCashSchema)
     if user_from_cash is not None:
         await user_is_active(user_from_cash)
         return user_from_cash
 
     user_from_db = await crud.get_user_by_id_repo(session, user_id, joinedload(User.timezone))
     user = UserCashSchema.model_validate(user_from_db)
-    await update_cache(settings.redis.user_prefix, user, settings.redis.user_ttl or settings.redis.global_ttl)
+    await update_object_cache(settings.redis.user_prefix, user, settings.redis.user_ttl or settings.redis.global_ttl)
 
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
@@ -61,7 +61,7 @@ async def get_user_from_refresh_token(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
 ) -> User | UserCashSchema:
     """Получает объект пользователя из рефреш токена."""
-    user_from_cash = await get_from_cache(settings.redis.user_prefix, user_id, UserCashSchema)
+    user_from_cash = await get_object_from_cache(settings.redis.user_prefix, user_id, UserCashSchema)
     if user_from_cash is not None:
         await user_is_active(user_from_cash)
         return user_from_cash
