@@ -28,9 +28,12 @@ async def _get_timezone_by_id_from_db(
 
 
 async def get_timezone_by_id(
-    session: AsyncSession, id: int, cache: bool = True
+    session: AsyncSession, id: int | None, cache: bool = True
 ) -> Timezone | TimezoneCacheSchema | None:
     """Получение информации о таймзоне по id."""
+    if id is None:
+        return None
+
     if cache is False:
         tz: Timezone = await _get_timezone_by_id_from_db(session, id)
         return tz
