@@ -7,18 +7,21 @@ from sqlalchemy.orm import joinedload
 
 from app.api.v1.dependencies.jwt import get_current_user_id, get_user_id_from_refresh_token
 from app.api.v1.users import crud
-from app.api.v1.users.schemas import UserCashSchema, UserLoginSchema
+from app.api.v1.users.schemas import UserCashSchema, UserLoginSchema, UserReadTZSchema
 from app.config import settings
 from app.db import db_helper
 from app.db.models import User
-from app.db.redis import get_object_from_cache, update_object_cache
+from app.db.redis import get_object_from_cache
 
 
-async def user_is_active(user: User | UserCashSchema) -> bool:
-    """Проверяет активен ли пользователь."""
-    if user.active is False:
+def validate_user(user: User | UserCashSchema) -> bool:
+    """Валидирует пользователя."""
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
+    if not user.active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Аккаунт пользователя не активен")
     return True
+
 
 
 async def auth_user(
@@ -26,13 +29,10 @@ async def auth_user(
 ) -> User:
     """Возвращает авторизованного пользователя."""
     user = await crud.get_user_by_email_repo(session, user_credentials.email)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Некорректный email или пароль")
+    validate_user(user)
+
     if not user.verify_password(user_credentials.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Некорректный email или пароль")
-
-    await user_is_active(user)
-
     return user
 
 
@@ -41,34 +41,26 @@ async def get_current_user(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
 ) -> UserCashSchema:
     """Получает текущего пользователя."""
-    user_from_cash = await get_object_from_cache(settings.redis.user_prefix, user_id, UserCashSchema)
-    if user_from_cash is not None:
-        await user_is_active(user_from_cash)
-        return user_from_cash
+    user = await crud.get_user_by_id(session, user_id)
+    validate_user(user)
+    return user
 
-    user_from_db = await crud.get_user_by_id_repo(session, user_id, joinedload(User.timezone))
-    user = UserCashSchema.model_validate(user_from_db)
-    await update_object_cache(settings.redis.user_prefix, user, settings.redis.user_ttl or settings.redis.global_ttl)
 
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
-    await user_is_active(user)
+async def get_current_user_with_tz(
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
+) -> UserReadTZSchema:
+    """Получает текущего пользователя с информацией о таймзоне."""
+    user = await crud.get_user_by_id(session, user_id, with_tz=True)
+    validate_user(user)
     return user
 
 
 async def get_user_from_refresh_token(
     user_id: Annotated[UUID, Depends(get_user_id_from_refresh_token)],
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-) -> User | UserCashSchema:
+) -> UserCashSchema:
     """Получает объект пользователя из рефреш токена."""
-    user_from_cash = await get_object_from_cache(settings.redis.user_prefix, user_id, UserCashSchema)
-    if user_from_cash is not None:
-        await user_is_active(user_from_cash)
-        return user_from_cash
-
-    user = await crud.get_user_by_id_repo(session, user_id=user_id)
-
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
-    await user_is_active(user)
+    user = await crud.get_user_by_id(session, user_id)
+    validate_user(user)
     return user
