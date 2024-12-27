@@ -9,9 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.strategy_options import _AbstractLoad
 
+from app.api.v1.users.schemas import UserCashSchema, UserReadTZSchema
+import app.api.v1.classifiers.crud as classifiers_crud
 from app.config import settings
 from app.constants import USER_IMAGE
 from app.db.models import User
+from app.db.redis import get_raw_data_from_cache, update_object_cache
 from app.utils.file_utils import delete_file, save_file, validate_file_extension, validate_file_size
 
 
@@ -40,7 +43,7 @@ async def create_user_repo(
         user.image = await save_file(image, settings.files.users_images_path)
     session.add(user)
     await session.commit()
-    user = await get_user_by_id_repo(session, user.id, joinedload(User.timezone))
+    user = await get_user_by_id(session, user.id, joinedload(User.timezone))
     return user
 
 
@@ -67,13 +70,39 @@ async def get_user_by_email_or_username_repo(
     return results.scalars().first()
 
 
-async def get_user_by_id_repo(session: AsyncSession, user_id: UUID, *option: _AbstractLoad) -> User | None:
-    """Возвращает пользователя с заданным id."""
+async def _get_user_by_id_from_db(session: AsyncSession, user_id: UUID, with_tz: bool = False) -> User | None:
+    """Получение пользователя из бд."""
     stmt = select(User).where(User.id == user_id)
-    if option:
-        stmt = stmt.options(*option)
-    results: Result = await session.execute(stmt)
+    if with_tz:
+        stmt = stmt.options(joinedload(User.timezone))
+    results = await session.execute(stmt)
     return results.scalar()
+
+
+async def get_user_by_id(
+    session: AsyncSession, user_id: UUID, cache: bool = True, with_tz: bool = False
+) -> User | UserCashSchema | UserReadTZSchema | None:
+    """Возвращает пользователя с заданным id."""
+    if not cache:
+        return await _get_user_by_id_from_db(session, user_id, with_tz)
+
+    user_raw_cache = await get_raw_data_from_cache(settings.redis.user_prefix, user_id)
+    if user_raw_cache is not None:
+        if with_tz:
+            user_raw_cache["timezone"] = classifiers_crud.get_timezone_by_id(session, user_raw_cache["timezone_id"])
+            user_cache = UserReadTZSchema(**user_raw_cache)
+        else:
+            user_cache = UserCashSchema(**user_raw_cache)
+        return user_cache
+
+    user = await _get_user_by_id_from_db(session, user_id, with_tz)
+    await update_object_cache(settings.redis.user_prefix, UserCashSchema.model_validate(user))
+    if with_tz:
+        user_cache = UserReadTZSchema.model_validate(user)
+    else:
+        user_cache = UserCashSchema.model_validate(user)
+    return user_cache
+
 
 
 async def schedule_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> User:
