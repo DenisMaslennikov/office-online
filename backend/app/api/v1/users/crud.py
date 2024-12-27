@@ -104,7 +104,6 @@ async def get_user_by_id(
     return user_cache
 
 
-
 async def schedule_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> User:
     """Добавляет пользователя в очередь на удаление."""
     stmt = (
