@@ -26,5 +26,5 @@ pytest: ## Выполняем тесты на pytest с запуском чис�
         docker compose -p to-do-list-flask-pytest -f docker-compose-pytest.yml down -v && exit 1 \
     )
 
-drop_cash:
+drop_cache:
 	docker rm office_online-redis-1 && docker volume rm office_online_redisdata
