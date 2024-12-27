@@ -4,22 +4,24 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from app.api.v1.auth.jwt import create_access_token, create_refresh_token, decode_token
-from app.api.v1.classifiers.crud import get_timezone_by_id
 from app.api.v1.dependencies.jwt import get_current_user_id
-from app.api.v1.dependencies.users import auth_user, get_current_user, get_user_from_refresh_token, \
-    get_current_user_with_tz
+from app.api.v1.dependencies.users import (
+    auth_user,
+    get_user_from_refresh_token,
+    get_current_user_with_tz,
+)
 from app.api.v1.users import crud
 from app.api.v1.users.schemas import (
     JWTTokenForValidationSchema,
     JWTTokensPairWithTokenTypeSchema,
     TokenValidationResultSchema,
-    UserCashSchema,
+    UserCacheSchema,
     UserReadTZSchema,
     UserWithoutTZSchema,
 )
+from app.api.v1.users.tools import add_tz_to_user
 from app.config import settings
 from app.constants import DEFAULT_RESPONSES
 from app.db import db_helper
@@ -53,7 +55,7 @@ async def create_tokens(user: Annotated[User, Depends(auth_user)]) -> JWTTokensP
     },
 )
 async def tokens_refresh(
-    user: Annotated[User | UserCashSchema, Depends(get_user_from_refresh_token)]
+    user: Annotated[User | UserCacheSchema, Depends(get_user_from_refresh_token)]
 ) -> JWTTokensPairWithTokenTypeSchema:
     """Обновление токенов по refresh токену."""
     return JWTTokensPairWithTokenTypeSchema(
@@ -107,9 +109,7 @@ async def user_register(
         image=image,
         timezone_id=timezone_id,
     )
-    return UserReadTZSchema(
-        **(user_cache.model_dump() | {"timezone": await get_timezone_by_id(session, user_cache.timezone_id)})
-    )
+    return await add_tz_to_user(user_cache, session)
 
 
 @router.get("/me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
@@ -118,15 +118,14 @@ async def get_user_me(user: Annotated[UserReadTZSchema, Depends(get_current_user
     return user
 
 
-@router.delete("/me/", response_model=UserWithoutTZSchema, responses=DEFAULT_RESPONSES)
-async def delete_user_me(
+@router.delete("/me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
+async def schedule_deletion_user_me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
-) -> User:
+) -> UserReadTZSchema:
     """Удаление текущего авторизированного пользователя."""
-    user = await crud.schedule_user_deletion(session, user_id)
-    await delete_from_cache(settings.redis.user_prefix, user.id)
-    return user
+    user_cache = await crud.schedule_user_deletion(session, user_id)
+    return await add_tz_to_user(user_cache, session)
 
 
 @router.post("/cancel_deletion_me/", response_model=UserWithoutTZSchema, responses=DEFAULT_RESPONSES)
@@ -163,7 +162,7 @@ async def partial_update_user_me(
         image=image,
         timezone_id=timezone_id,
     )
-    user_cash_schema = UserCashSchema.model_validate(user)
+    user_cash_schema = UserCacheSchema.model_validate(user)
     await update_object_cache(
         settings.redis.user_prefix, user_cash_schema, settings.redis.user_ttl or settings.redis.global_ttl
     )

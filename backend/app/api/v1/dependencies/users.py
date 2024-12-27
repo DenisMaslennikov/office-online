@@ -7,14 +7,14 @@ from sqlalchemy.orm import joinedload
 
 from app.api.v1.dependencies.jwt import get_current_user_id, get_user_id_from_refresh_token
 from app.api.v1.users import crud
-from app.api.v1.users.schemas import UserCashSchema, UserLoginSchema, UserReadTZSchema
+from app.api.v1.users.schemas import UserCacheSchema, UserLoginSchema, UserReadTZSchema
 from app.config import settings
 from app.db import db_helper
 from app.db.models import User
 from app.db.redis import get_object_from_cache
 
 
-def validate_user(user: User | UserCashSchema | UserReadTZSchema | None) -> bool:
+def validate_user(user: User | UserCacheSchema | UserReadTZSchema | None) -> bool:
     """Валидирует пользователя."""
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
@@ -37,7 +37,7 @@ async def auth_user(
 async def get_current_user(
     user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-) -> UserCashSchema:
+) -> UserCacheSchema:
     """Получает текущего пользователя."""
     user = await crud.get_user_by_id(session, user_id)
     validate_user(user)
@@ -57,7 +57,7 @@ async def get_current_user_with_tz(
 async def get_user_from_refresh_token(
     user_id: Annotated[UUID, Depends(get_user_id_from_refresh_token)],
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-) -> UserCashSchema:
+) -> UserCacheSchema:
     """Получает объект пользователя из рефреш токена."""
     user = await crud.get_user_by_id(session, user_id)
     validate_user(user)

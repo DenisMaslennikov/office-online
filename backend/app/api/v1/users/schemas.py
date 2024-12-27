@@ -45,7 +45,7 @@ class UserWithoutTZSchema(BaseUserSchema):
         return f"{settings.files_urls.users_images_url}{self.image}"
 
 
-class UserCashSchema(BaseUserSchema):
+class UserCacheSchema(BaseUserSchema):
     """Сериализатор для кеширования пользователя."""
 
     id: UUID

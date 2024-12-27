@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.strategy_options import _AbstractLoad
 
-from app.api.v1.users.schemas import UserCashSchema, UserReadTZSchema
+from app.api.v1.users.schemas import UserCacheSchema, UserReadTZSchema
 import app.api.v1.classifiers.crud as classifiers_crud
 from app.config import settings
 from app.constants import USER_IMAGE
@@ -27,7 +27,7 @@ async def create_user(
     phone: str | None = None,
     image: UploadFile | None = None,
     timezone_id: int | None = None,
-) -> UserCashSchema:
+) -> UserCacheSchema:
     """Создание нового пользователя."""
     user = User(
         email=email,
@@ -43,7 +43,7 @@ async def create_user(
         user.image = await save_file(image, settings.files.users_images_path)
     session.add(user)
     await session.commit()
-    user_cache = UserCashSchema.model_validate(user)
+    user_cache = UserCacheSchema.model_validate(user)
     await update_object_cache(settings.redis.user_prefix, user_cache)
     return user_cache
 
@@ -82,7 +82,7 @@ async def _get_user_by_id_from_db(session: AsyncSession, user_id: UUID, with_tz:
 
 async def get_user_by_id(
     session: AsyncSession, user_id: UUID, cache: bool = True, with_tz: bool = False
-) -> User | UserCashSchema | UserReadTZSchema | None:
+) -> User | UserCacheSchema | UserReadTZSchema | None:
     """Возвращает пользователя с заданным id."""
     if not cache:
         return await _get_user_by_id_from_db(session, user_id, with_tz)
@@ -93,19 +93,19 @@ async def get_user_by_id(
             user_raw_cache["timezone"] = classifiers_crud.get_timezone_by_id(session, user_raw_cache["timezone_id"])
             user_cache = UserReadTZSchema(**user_raw_cache)
         else:
-            user_cache = UserCashSchema(**user_raw_cache)
+            user_cache = UserCacheSchema(**user_raw_cache)
         return user_cache
 
     user = await _get_user_by_id_from_db(session, user_id, with_tz)
-    await update_object_cache(settings.redis.user_prefix, UserCashSchema.model_validate(user))
+    await update_object_cache(settings.redis.user_prefix, UserCacheSchema.model_validate(user))
     if with_tz:
         user_cache = UserReadTZSchema.model_validate(user)
     else:
-        user_cache = UserCashSchema.model_validate(user)
+        user_cache = UserCacheSchema.model_validate(user)
     return user_cache
 
 
-async def schedule_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> User:
+async def schedule_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> UserCacheSchema:
     """Добавляет пользователя в очередь на удаление."""
     stmt = (
         update(User)
@@ -117,7 +117,9 @@ async def schedule_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> U
     result = await session.execute(stmt)
     updated_user = result.scalar_one()
     await session.commit()
-    return updated_user
+    user_cache = UserCacheSchema.model_validate(updated_user)
+    await update_object_cache(settings.redis.user_prefix, user_cache)
+    return user_cache
 
 
 async def update_user_repo(
