@@ -21,7 +21,7 @@ async def get_from_cache(prefix: str, id: str | uuid.UUID | int, model: Type[Bas
     if redis_data is None:
         return None
     data = orjson.loads(redis_data)
-    if len(data["id"]) == 36:
+    if len(data["id"]) == 36:  # Длина uuid
         data["id"] = uuid.UUID(data["id"])
     return model(**data)
 
