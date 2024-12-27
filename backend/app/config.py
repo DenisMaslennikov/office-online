@@ -58,6 +58,9 @@ class RedisSettings(BaseModel):
     user_prefix: str = "user"
     user_ttl: int | None = None
 
+    timezone_prefix: str = "timezones"
+    timezone_ttl: int | None = None
+
 
 class JWTSettings(BaseModel):
     """Конфигурация настроек безопасности."""
