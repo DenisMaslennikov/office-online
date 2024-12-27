@@ -27,7 +27,7 @@ async def auth_user(
     user_credentials: UserLoginSchema, session: Annotated[AsyncSession, Depends(db_helper.get_session)]
 ) -> User:
     """Возвращает авторизованного пользователя."""
-    user = await crud.get_user_by_email_repo(session, user_credentials.email)
+    user = await crud.get_user_by_email(session, user_credentials.email)
     validate_user(user)
     if not user.verify_password(user_credentials.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Некорректный email или пароль")

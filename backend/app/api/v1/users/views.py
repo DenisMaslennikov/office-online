@@ -128,15 +128,14 @@ async def schedule_deletion_user_me(
     return await add_tz_to_user(user_cache, session)
 
 
-@router.post("/cancel_deletion_me/", response_model=UserWithoutTZSchema, responses=DEFAULT_RESPONSES)
+@router.post("/cancel_deletion_me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
 async def cancel_deletion_user_me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
-) -> User:
+) -> UserReadTZSchema:
     """Отменяет запланированное удаление пользователя."""
-    user = await crud.cancel_user_deletion(session, user_id)
-    await delete_from_cache(settings.redis.user_prefix, user.id)
-    return user
+    user_cache = await crud.cancel_user_deletion(session, user_id)
+    return await add_tz_to_user(user_cache, session)
 
 
 @router.patch("/me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
@@ -149,7 +148,7 @@ async def partial_update_user_me(
     phone: Annotated[str | None, Form()] = None,
     image: Annotated[UploadFile | None, File()] = None,
     timezone_id: Annotated[int | None, Form()] = None,
-) -> User:
+) -> UserReadTZSchema:
     """Частичное обновление информации о пользователе."""
     user = await crud.get_user_by_id(session, user_id, with_tz=False, cache=False)
     user = await crud.update_user_repo(
@@ -162,8 +161,4 @@ async def partial_update_user_me(
         image=image,
         timezone_id=timezone_id,
     )
-    user_cash_schema = UserCacheSchema.model_validate(user)
-    await update_object_cache(
-        settings.redis.user_prefix, user_cash_schema, settings.redis.user_ttl or settings.redis.global_ttl
-    )
-    return user
+    return await add_tz_to_user(user, session)

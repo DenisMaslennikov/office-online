@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timezone
+from pprint import pprint
 from uuid import UUID
 
 from fastapi import UploadFile
@@ -48,12 +49,14 @@ async def create_user(
     return user_cache
 
 
-async def get_user_by_email_repo(session: AsyncSession, email: str, *option: _AbstractLoad) -> User | None:
+async def get_user_by_email(session: AsyncSession, email: str, with_tz: bool = False) -> User | None:
     """Получает пользователя по его email."""
     stmt = select(User).where(User.email == email)
-    if option:
-        stmt = stmt.options(*option)
-    results: Result = await session.execute(stmt)
+    if with_tz:
+        stmt = stmt.options(joinedload(User.timezone_id))
+    results = await session.execute(stmt)
+    user_cache = UserCacheSchema.model_validate(results)
+    await update_object_cache(settings.redis.user_prefix, user_cache)
     return results.scalar()
 
 
@@ -90,7 +93,9 @@ async def get_user_by_id(
     user_raw_cache = await get_raw_data_from_cache(settings.redis.user_prefix, user_id)
     if user_raw_cache is not None:
         if with_tz:
-            user_raw_cache["timezone"] = classifiers_crud.get_timezone_by_id(session, user_raw_cache["timezone_id"])
+            user_raw_cache["timezone"] = await classifiers_crud.get_timezone_by_id(
+                session, user_raw_cache["timezone_id"]
+            )
             user_cache = UserReadTZSchema(**user_raw_cache)
         else:
             user_cache = UserCacheSchema(**user_raw_cache)
@@ -112,7 +117,6 @@ async def schedule_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> U
         .where(User.id == user_id)
         .values(scheduled_deletion_date=datetime.now(timezone.utc) + settings.users.user_deletion_timedelta)
         .returning(User)
-        .options(joinedload(User.timezone))
     )
     result = await session.execute(stmt)
     updated_user = result.scalar_one()
@@ -131,7 +135,7 @@ async def update_user_repo(
     phone: str | None = None,
     image: UploadFile | None = None,
     timezone_id: int | None = None,
-) -> User:
+) -> UserCacheSchema:
     """Частичное обновление информации о пользователе."""
     if email is not None:
         user.email = email
@@ -151,19 +155,17 @@ async def update_user_repo(
         user.timezone_id = timezone_id
     await session.commit()
     await session.refresh(user)
-    return user
+    user_cache = UserCacheSchema.model_validate(user)
+    await update_object_cache(settings.redis.user_prefix, user_cache)
+    return user_cache
 
 
-async def cancel_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> User:
+async def cancel_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> UserCacheSchema:
     """Отменяет удаление пользователя."""
-    stmt = (
-        update(User)
-        .where(User.id == user_id)
-        .values(scheduled_deletion_date=None)
-        .returning(User)
-        .options(joinedload(User.timezone))
-    )
+    stmt = update(User).where(User.id == user_id).values(scheduled_deletion_date=None).returning(User)
     result = await session.execute(stmt)
     updated_user = result.scalar_one()
     await session.commit()
-    return updated_user
+    user_cache = UserCacheSchema.model_validate(updated_user)
+    await update_object_cache(settings.redis.user_prefix, user_cache)
+    return user_cache
