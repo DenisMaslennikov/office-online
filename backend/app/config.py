@@ -53,7 +53,7 @@ class RedisSettings(BaseModel):
     host: str
     port: str
 
-    global_ttl: int = 3600
+    global_ttl: int = None
 
     user_prefix: str = "user"
     user_ttl: int | None = None
