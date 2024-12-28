@@ -21,7 +21,7 @@ async def save_file(uploaded_file: UploadFile, destination: os.PathLike) -> str:
     return filename
 
 
-async def delete_file(filename: str, destination: os.PathLike) -> None:
+def delete_file(filename: str, destination: os.PathLike) -> None:
     """Удаляет файл по указанному пути."""
     file_path = os.path.join(destination, filename)
     if os.path.exists(file_path):

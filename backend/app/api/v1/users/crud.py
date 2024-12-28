@@ -152,7 +152,7 @@ async def update_user_repo(
         validate_file_size(image, FileTypes.USER_IMAGE)
         validate_file_extension(image, FileTypes.USER_IMAGE)
         if user.image is not None:
-            await delete_file(user.image, settings.files.users_images_path)
+            delete_file(user.image, settings.files.users_images_path)
         user.image = await save_file(image, settings.files.users_images_path)
     if timezone_id is not None:
         if timezone_id == 0:
