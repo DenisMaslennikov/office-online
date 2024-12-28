@@ -3,15 +3,12 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from app.api.v1.dependencies.jwt import get_current_user_id, get_user_id_from_refresh_token
 from app.api.v1.users import crud
 from app.api.v1.users.schemas import UserCacheSchema, UserLoginSchema, UserReadTZSchema
-from app.config import settings
 from app.db import db_helper
 from app.db.models import User
-from app.db.redis import get_object_from_cache
 
 
 def validate_user(user: User | UserCacheSchema | UserReadTZSchema | None) -> bool:

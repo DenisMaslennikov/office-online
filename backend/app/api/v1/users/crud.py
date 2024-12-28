@@ -1,21 +1,19 @@
 import uuid
 from datetime import datetime, timezone
-from pprint import pprint
 from uuid import UUID
 
 from fastapi import UploadFile
 from pydantic import EmailStr
-from sqlalchemy import Result, or_, select, update
+from sqlalchemy import or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.strategy_options import _AbstractLoad
 
-from app.api.v1.users.schemas import UserCacheSchema, UserReadTZSchema
 import app.api.v1.classifiers.crud as classifiers_crud
+from app.api.v1.users.schemas import UserCacheSchema, UserReadTZSchema
 from app.config import settings
 from app.constants import USER_IMAGE
 from app.db.models import User
-from app.db.redis import get_raw_data_from_cache, update_object_cache, update_raw_data_cache, delete_from_cache
+from app.db.redis import delete_from_cache, get_raw_data_from_cache, update_object_cache, update_raw_data_cache
 from app.utils.file_utils import delete_file, save_file, validate_file_extension, validate_file_size
 
 

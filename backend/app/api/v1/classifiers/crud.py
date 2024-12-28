@@ -3,15 +3,14 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
 from app.api.v1.classifiers.schemas import TimezoneCacheSchema
+from app.config import settings
 from app.db.models import Timezone
 from app.db.redis import get_object_from_cache, update_object_cache
 
 
 async def get_list_timezones(session: AsyncSession) -> Sequence[Timezone]:
     """Получение списка всех таймзон."""
-
     stmt = select(Timezone)
     result = await session.execute(stmt)
     return result.scalars().all()
