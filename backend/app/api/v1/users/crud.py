@@ -159,7 +159,8 @@ async def update_user_repo(
     if timezone_id is not None:
         if timezone_id == 0:
             user.timezone_id = None
-        user.timezone_id = timezone_id
+        else:
+            user.timezone_id = timezone_id
     await session.commit()
     user_cache = UserCacheSchema.model_validate(user)
     await update_object_cache(settings.redis.user_prefix, user_cache)
