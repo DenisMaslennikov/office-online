@@ -5,6 +5,7 @@ import aiofiles
 from fastapi import HTTPException, UploadFile, status
 
 from app.config import settings
+from app.constants import FileTypes
 
 
 async def save_file(uploaded_file: UploadFile, destination: os.PathLike) -> str:
@@ -27,7 +28,7 @@ async def delete_file(filename: str, destination: os.PathLike) -> None:
         os.remove(file_path)
 
 
-def validate_file_size(file: UploadFile, file_type: str) -> None:
+def validate_file_size(file: UploadFile, file_type: FileTypes) -> None:
     """Проверяет допустимый размер файла."""
     global USER_IMAGE
     match file_type:
@@ -40,7 +41,7 @@ def validate_file_size(file: UploadFile, file_type: str) -> None:
                 )
 
 
-def validate_file_extension(file: UploadFile, file_type: str) -> None:
+def validate_file_extension(file: UploadFile, file_type: FileTypes) -> None:
     """Проверяет допустимый типы файлов."""
     global USER_IMAGE
     match file_type:

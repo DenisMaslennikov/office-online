@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 import app.api.v1.classifiers.crud as classifiers_crud
 from app.api.v1.users.schemas import UserCacheSchema, UserReadTZSchema
 from app.config import settings
-from app.constants import USER_IMAGE
+from app.constants import USER_IMAGE, FileTypes
 from app.db.models import User
 from app.db.redis import delete_from_cache, get_raw_data_from_cache, update_object_cache, update_raw_data_cache
 from app.utils.file_utils import delete_file, save_file, validate_file_extension, validate_file_size
@@ -37,8 +37,8 @@ async def create_user(
     )
     user.password = password
     if image is not None:
-        validate_file_size(image, USER_IMAGE)
-        validate_file_extension(image, USER_IMAGE)
+        validate_file_size(image, FileTypes.USER_IMAGE)
+        validate_file_extension(image, FileTypes.USER_IMAGE)
         user.image = await save_file(image, settings.files.users_images_path)
     session.add(user)
     await session.commit()
@@ -149,8 +149,8 @@ async def update_user_repo(
     if phone is not None:
         user.phone = phone
     if image is not None:
-        validate_file_size(image, USER_IMAGE)
-        validate_file_extension(image, USER_IMAGE)
+        validate_file_size(image, FileTypes.USER_IMAGE)
+        validate_file_extension(image, FileTypes.USER_IMAGE)
         if user.image is not None:
             await delete_file(user.image, settings.files.users_images_path)
         user.image = await save_file(image, settings.files.users_images_path)
