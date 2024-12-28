@@ -82,7 +82,7 @@ class FilesSettings(BaseModel):
     uploads_path: Path = BASE_DIR.parent / "uploads"
     users_images_path: Path = uploads_path / "users" / "images"
     user_image_maximum_size: int = 1024 * 1024 * 8  # 8MB
-    user_image_allowed_file_types: list[str] = ["png", "jpg", "jpeg", "gif"]
+    user_image_allowed_file_types: list[str] = [".png", ".jpg", ".jpeg", ".gif"]
 
 
 class FilesUrlsSettings(BaseModel):
