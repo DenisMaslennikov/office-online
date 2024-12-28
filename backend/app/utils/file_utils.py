@@ -30,25 +30,28 @@ async def delete_file(filename: str, destination: os.PathLike) -> None:
 
 def validate_file_size(file: UploadFile, file_type: FileTypes) -> None:
     """Проверяет допустимый размер файла."""
-    global USER_IMAGE
     match file_type:
-        case USER_IMAGE:
+        case FileTypes.USER_IMAGE:
             if file.size > settings.files.user_image_maximum_size:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Размер файла превышает максимально допустимый размер "
                     f"{settings.files.user_image_maximum_size / 1024 / 1024:.1f} Мегабайт",
                 )
+        case _:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неизвестный тип файла")
 
 
 def validate_file_extension(file: UploadFile, file_type: FileTypes) -> None:
     """Проверяет допустимый типы файлов."""
-    global USER_IMAGE
     match file_type:
-        case USER_IMAGE:
+        case FileTypes.USER_IMAGE:
             if os.path.splitext(file.filename)[1] not in settings.files.user_image_allowed_file_types:
+                print(os.path.splitext(file.filename)[1])
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Недопустимый тип файла разрешены только файлы "
-                    f"{settings.files.user_image_allowed_file_types}",
+                    detail=f"Недопустимый формат файла. Разрешены только файлы "
+                    f"{settings.files.user_image_allowed_file_types} форматов",
                 )
+        case _:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неизвестный тип файла")
