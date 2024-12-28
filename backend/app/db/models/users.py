@@ -37,6 +37,7 @@ class User(Base, UUIDPrimaryKeyMixin):
     scheduled_deletion_date: Mapped[datetime.datetime | None] = mapped_column(
         TIMESTAMP(timezone=True), comment="Запланированная дата удаления"
     )
+    email_confirm: Mapped[bool] = mapped_column(comment="Email подтвержден", default=False, server_default="false")
 
     timezone: Mapped["Timezone"] = relationship()
 
