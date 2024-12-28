@@ -50,5 +50,6 @@ DEFAULT_RESPONSES: dict[int, dict[str, str]] = {
 
 
 # Типы файлов
+@enum.unique
 class FileTypes(enum.Enum):
     USER_IMAGE: str = "USER_IMAGE"
