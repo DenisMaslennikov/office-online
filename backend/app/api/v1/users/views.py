@@ -6,28 +6,27 @@ from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.auth.jwt import create_access_token, create_refresh_token, decode_token
+from app.api.v1.core.schemas import ConfirmSchema
 from app.api.v1.dependencies.jwt import get_current_user_id
 from app.api.v1.dependencies.users import (
     auth_user,
-    get_user_from_refresh_token,
     get_current_user_with_tz,
+    get_user_from_refresh_token,
+    validate_user,
 )
 from app.api.v1.users import crud
-from app.api.v1.users.crud import get_user_by_email
 from app.api.v1.users.schemas import (
+    ChangePasswordSchema,
     JWTTokenForValidationSchema,
     JWTTokensPairWithTokenTypeSchema,
     TokenValidationResultSchema,
     UserCacheSchema,
     UserReadTZSchema,
-    UserWithoutTZSchema,
 )
 from app.api.v1.users.tools import add_tz_to_user
-from app.config import settings
 from app.constants import DEFAULT_RESPONSES
 from app.db import db_helper
 from app.db.models import User
-from app.db.redis import delete_from_cache, update_object_cache
 
 router = APIRouter(tags=["Users"])
 
@@ -171,3 +170,18 @@ async def partial_update_user_me(
         timezone_id=timezone_id,
     )
     return await add_tz_to_user(user, session)
+
+
+@router.post("/change_password/", response_model=ConfirmSchema, responses=DEFAULT_RESPONSES)
+async def change_password_me(
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
+    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+    passwords: ChangePasswordSchema,
+) -> ConfirmSchema:
+    """Смена пароля текущего пользователя."""
+    user = await crud.get_user_by_id(session, user_id, with_tz=False, cache=False)
+    validate_user(user)
+    if not user.verify_password(passwords.old_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Некорректный старый пароль")
+
+    return ConfirmSchema(success=await crud.change_user_password(session, user, passwords.new_password))

@@ -174,3 +174,10 @@ async def cancel_user_deletion(session: AsyncSession, user_id: uuid.UUID) -> Use
     user_cache = UserCacheSchema.model_validate(updated_user)
     await update_object_cache(settings.redis.user_prefix, user_cache)
     return user_cache
+
+
+async def change_user_password(session: AsyncSession, user: User, new_password: str) -> bool:
+    """Меняет пароль пользователя."""
+    user.password = new_password
+    await session.commit()
+    return True

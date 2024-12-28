@@ -14,6 +14,13 @@ class UserLoginSchema(BaseModel):
     password: str = Field(..., examples=["password"])
 
 
+class ChangePasswordSchema(BaseModel):
+    """Сериализатор для смены пароля."""
+
+    old_password: str = Field(..., examples=["old_password"])
+    new_password: str = Field(..., examples=["new_password"])
+
+
 class BaseUserSchema(BaseModel):
     """Базовая модель пользователя."""
 
