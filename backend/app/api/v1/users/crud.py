@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 import app.api.v1.classifiers.crud as classifiers_crud
 from app.api.v1.users.schemas import UserCacheSchema, UserReadTZSchema
 from app.config import settings
-from app.constants import USER_IMAGE, FileTypes
+from app.constants import FileTypes
 from app.db.models import User
 from app.db.redis import delete_from_cache, get_raw_data_from_cache, update_object_cache, update_raw_data_cache
 from app.utils.file_utils import delete_file, save_file, validate_file_extension, validate_file_size
