@@ -157,7 +157,7 @@ async def update_user_repo(
             await delete_file(user.image, settings.files.users_images_path)
         user.image = await save_file(image, settings.files.users_images_path)
     if timezone_id is not None:
-        if timezone_id == "":
+        if timezone_id == 0:
             user.timezone_id = None
         user.timezone_id = timezone_id
     await session.commit()

@@ -148,7 +148,7 @@ async def partial_update_user_me(
     display_name: Annotated[str | None, Form()] = None,
     phone: Annotated[str | None, Form()] = None,
     image: Annotated[UploadFile | None, File()] = None,
-    timezone_id: Annotated[int | None, Form()] = None,
+    timezone_id: Annotated[int | None, Form(description="Передайте ноль чтобы убрать таймзону")] = None,
 ) -> UserReadTZSchema:
     """Частичное обновление информации о пользователе."""
     user = await crud.get_user_by_id(session, user_id, with_tz=False, cache=False)
