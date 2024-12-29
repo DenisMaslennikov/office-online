@@ -18,6 +18,7 @@ services:
     volumes:
       - "./backend:/backend/"
       - uploads:/uploads
+      - "./logs:/logs"
     depends_on:
       db:
         condition: service_started

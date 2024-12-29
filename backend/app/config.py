@@ -74,6 +74,25 @@ class RabbitMQSettings(BaseModel):
     password: str
 
 
+class LoggerSettings(BaseModel):
+    """Настройка логирования."""
+
+    logs_dir: Path = BASE_DIR.parent / "logs"
+    app_log_file: Path = logs_dir / "app.log"
+    uvicorn_log_file: Path = logs_dir / "uvicorn.log"
+    uvicorn_log_level: str = "INFO"
+    uvicorn_custom_log_format: str = (
+        "%(asctime)s [%(processName)s: %(process)d] [%(threadName)s: %(thread)d] [%(levelname)s] %(name)s: %(message)s"
+    )
+    uvicorn_standard_log_format: str = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    uvicorn_max_bytes: int = 1024 * 1024 * 10  # 10 Мегабайт
+    uvicorn_backup_count: int = 5
+    app_log_format: str = "%(asctime)s | %(levelname)s | %(funcName)s | %(lineno)d | %(message)s"
+    app_log_level: str = "DEBUG"
+    app_max_bytes: int = 1024 * 1024 * 10  # 10 Мегабайт
+    app_backup_count: int = 5
+
+
 class JWTSettings(BaseModel):
     """Конфигурация настроек безопасности."""
 
@@ -133,6 +152,9 @@ class Settings(BaseSettings):
 
     # Настройки RabbitMQ
     rabbitmq: RabbitMQSettings
+
+    # Настройки логирования
+    logs: LoggerSettings = LoggerSettings()
 
     # Надо ли отслеживать изменения в файлах и перезапускать uvicorn
     reload: bool = True
