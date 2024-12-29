@@ -50,6 +50,7 @@ services:
   rabbitmq:
     image: rabbitmq:4-management
     hostname: rabbitmq
+    env_file: config/.env
     ports:
       - 15672:15672
     volumes:
