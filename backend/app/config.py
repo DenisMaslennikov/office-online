@@ -69,7 +69,7 @@ class RabbitMQSettings(BaseModel):
     """Настройки RabbitMQ."""
 
     host: str
-    port: str
+    port: int
     user: str
     password: str
 
