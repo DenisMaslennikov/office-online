@@ -33,11 +33,15 @@ COPY ./docker/utils/wait-for-it.sh /wait-for-it.sh
 
 COPY ./docker/utils/entrypoint.sh /docker-entrypoint.sh
 
+COPY ./docker/utils/migration-entrypoint.sh /migration-entrypoint.sh
+
 # Установка соответствующих разрешений:
 RUN chmod +x '/wait-for-it.sh' \
   && chmod +x '/docker-entrypoint.sh' \
+  && chmod +x '/migration-entrypoint.sh' \
   # Замена разделителя строк CRLF на LF для пользователей Windows:
   && sed -i 's/\r$//g' '/docker-entrypoint.sh' \
+  && sed -i 's/\r$//g' '/migration-entrypoint.sh' \
   && sed -i 's/\r$//g' '/wait-for-it.sh'
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

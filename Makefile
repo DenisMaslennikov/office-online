@@ -16,7 +16,7 @@ lock: ## Обновить зависимости проекта с исполь�
 	docker compose run --build --user=root --rm $(CONTAINER_NAME) poetry lock
 
 migrations:  ## Создать миграции make migrations MSG="Добавить новую таблицу users"
-	docker compose --env-file config/.env run --user=root --rm $(CONTAINER_NAME) python alembic_autogenerate.py "$(MSG)"
+	docker compose run --user=root --rm migrations python alembic_autogenerate.py "$(MSG)"
 
 test: pytest
 
