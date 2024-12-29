@@ -11,12 +11,12 @@ LOGGING_CONFIG = {
         "default": {
             "formatter": "standard",
             "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",  # Default is stderr
+            "stream": "ext://sys.stdout",
         },
         "stream_handler": {
             "formatter": "custom_formatter",
             "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",  # Default is stderr
+            "stream": "ext://sys.stdout",
         },
         "file_handler": {
             "formatter": "custom_formatter",
