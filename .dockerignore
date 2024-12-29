@@ -168,3 +168,5 @@ config/.env
 ../Makefile
 PROD.md
 README.md
+
+logs/
