@@ -28,3 +28,6 @@ pytest: ## Выполняем тесты на pytest с запуском чис�
 
 drop_cache:
 	docker rm office_online-redis-1 && docker volume rm office_online_redisdata
+	
+drop_rabbitmq:
+	docker rm office_online-rabbitmq-1 && docker volume rm office_online_rabbitmqdata
