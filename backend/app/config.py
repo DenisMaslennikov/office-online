@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 from pathlib import Path
 
@@ -72,6 +73,10 @@ class RabbitMQSettings(BaseModel):
     port: int
     user: str
     password: str
+
+    exchange_name_template: str = "company_{company_id}"
+    routing_key_template: str = "chanel_{chanel_id}"
+    queue_name_template: str = "user_{user_id}"
 
 
 class LoggerSettings(BaseModel):
