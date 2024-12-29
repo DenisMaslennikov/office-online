@@ -23,6 +23,8 @@ services:
         condition: service_started
       migrations:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
     restart: always
 
   migrations:
@@ -31,6 +33,7 @@ services:
       dockerfile: docker/dev/api/Dockerfile
     command: python3 alembic_upgrade_head.py
     env_file: config/.env
+    entrypoint: /migration-entrypoint.sh
     volumes:
       - "./backend:/backend/"
     depends_on:
@@ -44,7 +47,17 @@ services:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: rabbitmq
+    ports:
+      - 15672:15672
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
 volumes:
   pgdata:
   uploads:
   redisdata:
+  rabbitmqdata:
