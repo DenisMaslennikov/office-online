@@ -65,6 +65,15 @@ class RedisSettings(BaseModel):
     }
 
 
+class RabbitMQSettings(BaseModel):
+    """Настройки RabbitMQ."""
+
+    host: str
+    port: str
+    user: str
+    password: str
+
+
 class JWTSettings(BaseModel):
     """Конфигурация настроек безопасности."""
 
@@ -121,6 +130,9 @@ class Settings(BaseSettings):
 
     # Настройки Redis.
     redis: RedisSettings
+
+    # Настройки RabbitMQ
+    rabbitmq: RabbitMQSettings
 
     # Надо ли отслеживать изменения в файлах и перезапускать uvicorn
     reload: bool = True
