@@ -12,6 +12,7 @@ class ApiV1Endpoints(BaseModel):
     """Эндпоинты первой версии апи."""
 
     users: str = "/users"
+    websocket: str = "/ws"
 
 
 class ApiV1(BaseModel):
@@ -75,7 +76,7 @@ class RabbitMQSettings(BaseModel):
     password: str
 
     exchange_name_template: str = "company_{company_id}"
-    routing_key_template: str = "chanel_{chanel_id}"
+    routing_key_template: str = "chanel_{channel_id}"
     queue_name_template: str = "user_{user_id}"
 
 
