@@ -37,6 +37,7 @@ services:
     entrypoint: /migration-entrypoint.sh
     volumes:
       - "./backend:/backend/"
+      - "./logs:/logs"
     depends_on:
       - db
 
