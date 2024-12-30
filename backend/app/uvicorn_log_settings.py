@@ -2,7 +2,7 @@ from app.config import settings
 
 LOGGING_CONFIG = {
     "version": 1,
-    "disable_existing_loggers": True,
+    "disable_existing_loggers": False,
     "formatters": {
         "standard": {"format": settings.logs.uvicorn_standard_log_format},
         "custom_formatter": {"format": settings.logs.uvicorn_custom_log_format},
