@@ -1,9 +1,12 @@
 import asyncio
+from pprint import pprint
 from uuid import UUID, uuid4
 
 import orjson
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from dns.asyncresolver import try_ddr
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
 
+from app.config import settings
 from app.logger import logger
 from app.rabbitmq import rabbitmq_client
 
@@ -35,9 +38,20 @@ async def chat_websocket(websocket: WebSocket) -> None:
     consume_queue_task = asyncio.create_task(consume_queue())
     try:
         while True:
-            message = await websocket.receive_json()
+            message = await websocket.receive_text()
+            if len(message.encode("utf-8")) > settings.max_websocket_message_size:
+                await websocket.close(code=1009, reason="Слишком большое сообщение")
+                break
+            try:
+                message_json = orjson.loads(message)
+                pprint(message_json)
+            except orjson.JSONDecodeError as e:
+                logger.error(f"Ошибка декодирования json для сообщения {message}", exc_info=e)
+                await websocket.close(code=1003, reason="Полученное сообщение не является json")
+                break
+
             logger.debug(f"Получено сообщение от {user_id} message: {message}")
-            await rabbitmq_client.publish(company_id, chanel_id, orjson.dumps(message))
+            await rabbitmq_client.publish(company_id, chanel_id, message.encode("utf-8"))
     except WebSocketDisconnect:
         logger.debug(f"Клиент {user_id} отключился")
     finally:

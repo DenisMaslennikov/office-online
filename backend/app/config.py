@@ -149,6 +149,10 @@ class Settings(BaseSettings):
     # Настройка компаний
     companies: CompaniesSettings = CompaniesSettings()
 
+    # Настройки websocket.
+    # Максимальный размер сообщения которое может обработать websocket.
+    max_websocket_message_size: int = 1024 * 4  # 4 KB
+
     # Настройки подключения к базе данных
     db: DataBaseSettings
 
