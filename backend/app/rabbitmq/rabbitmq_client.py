@@ -109,8 +109,9 @@ class AIORabbiMQClient:
         """Получение сообщения из очереди."""
         queue = await self.declare_queue(user_id)
         async for message in queue:
+            logger.debug("Получено сообщение из очереди")
             async with message.process():
-                await callback(message.body())
+                await callback(message.body.decode())
 
     async def close(self):
         """Закрытие подключения."""
