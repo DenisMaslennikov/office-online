@@ -53,4 +53,5 @@ DEFAULT_RESPONSES: dict[int, dict[str, str]] = {
 @enum.unique
 class FileTypes(enum.Enum):
     """Enum хранилище типов файлов."""
+
     USER_IMAGE: str = "USER_IMAGE"
