@@ -1,8 +1,10 @@
 from pprint import pprint
+from typing import Callable, Awaitable
 from uuid import UUID
 
 import aio_pika
-from aio_pika.abc import AbstractExchange
+from aio_pika import Queue
+from aio_pika.abc import AbstractExchange, AbstractQueue
 
 from app.config import settings
 from app.logger import logger
@@ -53,7 +55,7 @@ class AIORabbiMQClient:
         )
         return self.exchanges[exchange_name]
 
-    async def publish(self, company_id: UUID, channel_id: UUID, message: str) -> None:
+    async def publish(self, company_id: UUID, channel_id: UUID, message: bytes) -> None:
         """Публикует сообщение в обменник."""
         exchange_name = settings.rabbitmq.exchange_name_template.format(company_id=company_id)
         routing_key = settings.rabbitmq.routing_key_template.format(channel_id=channel_id)
@@ -75,8 +77,7 @@ class AIORabbiMQClient:
 
         exchange = await self._declare_exchange(exchange_name, aio_pika.ExchangeType.TOPIC, auto_delete=True)
 
-        queue_name = settings.rabbitmq.queue_name_template.format(user_id=user_id)
-        queue = await self.channel.declare_queue(queue_name, exclusive=True)
+        queue = await self.declare_queue(user_id)
 
         logger.debug(
             f"Обновляю слушателя канала {channel_id} в компании {company_id} для пользователя {user_id} действие "
@@ -91,14 +92,25 @@ class AIORabbiMQClient:
             logger.error(f"Неизвестный тип действия {action}")
             raise ValueError(f"Недопустимый тип действия {action}")
 
+    async def declare_queue(self, user_id: UUID) -> AbstractQueue:
+        """Создает или получает очередь."""
+        queue_name = settings.rabbitmq.queue_name_template.format(user_id=user_id)
+        return await self.channel.declare_queue(queue_name, exclusive=True)
+
     async def delete_queue(self, user_id: UUID) -> None:
         """Удаление очереди."""
-        queue_name = settings.rabbitmq.queue_name_template.format(user_id=user_id)
-        queue = await self.channel.declare_queue(queue_name, exclusive=True)
+        queue = await self.declare_queue(user_id)
         logger.debug(f"Отчищаю очередь для пользователя {user_id}")
         await queue.purge()
         logger.debug(f"Удаляю очередь пользователя {user_id}")
         await queue.delete()
+
+    async def consume(self, user_id: UUID, callback: Callable[[str], Awaitable[None]]) -> None:
+        """Получение сообщения из очереди."""
+        queue = await self.declare_queue(user_id)
+        async for message in queue:
+            async with message.process():
+                await callback(message.body())
 
     async def close(self):
         """Закрытие подключения."""
