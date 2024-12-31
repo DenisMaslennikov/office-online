@@ -1,9 +1,7 @@
-from pprint import pprint
-from typing import Callable, Awaitable
+from typing import Awaitable, Callable
 from uuid import UUID
 
 import aio_pika
-from aio_pika import Queue
 from aio_pika.abc import AbstractExchange, AbstractQueue
 
 from app.config import settings

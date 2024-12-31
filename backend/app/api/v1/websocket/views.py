@@ -6,7 +6,6 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.logger import logger
 from app.rabbitmq import rabbitmq_client
-from app.db.models.mixins import UUIDPrimaryKeyMixin
 
 router = APIRouter(tags=["websocket"])
 
@@ -22,6 +21,7 @@ async def rabbitmq_message_handler(message: str, websocket: WebSocket):
 
 @router.websocket("/chat/")
 async def chat_websocket(websocket: WebSocket) -> None:
+    """Метод для обслуживания вебсокет подключения к чату."""
     logger.debug("Новое подключение к websocket")
     await websocket.accept()
     user_id = uuid4()
