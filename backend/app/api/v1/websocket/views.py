@@ -1,11 +1,13 @@
 import asyncio
 from pprint import pprint
+from typing import Annotated
 from uuid import UUID, uuid4
 
 import orjson
-from dns.asyncresolver import try_ddr
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from app.api.v1.dependencies.jwt import get_current_user_id
+from app.api.v1.websocket.functions import rabbitmq_message_handler
 from app.config import settings
 from app.logger import logger
 from app.rabbitmq import rabbitmq_client
@@ -16,14 +18,8 @@ company_id = UUID("e7682ea1-d0fd-44e1-9760-5d2f6b83e969")
 chanel_id = UUID("a56fef68-33cd-4173-917b-e74365a5cdb8")
 
 
-async def rabbitmq_message_handler(message: str, websocket: WebSocket):
-    """Обработка сообщения из RabbitMQ."""
-    logger.debug(f"Получено сообщение из RabbitMQ {message}")
-    await websocket.send_text(message)
-
-
 @router.websocket("/chat/")
-async def chat_websocket(websocket: WebSocket) -> None:
+async def chat_websocket(websocket: WebSocket, user_id: Annotated[UUID, get_current_user_id]) -> None:
     """Метод для обслуживания вебсокет подключения к чату."""
     logger.debug("Новое подключение к websocket")
     await websocket.accept()
@@ -39,7 +35,7 @@ async def chat_websocket(websocket: WebSocket) -> None:
     try:
         while True:
             message = await websocket.receive_text()
-            if len(message.encode("utf-8")) > settings.max_websocket_message_size:
+            if len(message.encode("utf-8")) > settings.websocket.max_websocket_message_size:
                 await websocket.close(code=1009, reason="Слишком большое сообщение")
                 break
             try:
