@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
@@ -121,7 +121,7 @@ async def get_user_me(user: Annotated[UserReadTZSchema, Depends(get_current_user
 @router.delete("/me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
 async def schedule_deletion_user_me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
 ) -> UserReadTZSchema:
     """Удаление текущего авторизированного пользователя."""
     user_cache = await crud.schedule_user_deletion(session, user_id)
@@ -131,7 +131,7 @@ async def schedule_deletion_user_me(
 @router.post("/cancel_deletion_me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
 async def cancel_deletion_user_me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
 ) -> UserReadTZSchema:
     """Отменяет запланированное удаление пользователя."""
     user_cache = await crud.cancel_user_deletion(session, user_id)
@@ -141,7 +141,7 @@ async def cancel_deletion_user_me(
 @router.patch("/me/", response_model=UserReadTZSchema, responses=DEFAULT_RESPONSES)
 async def partial_update_user_me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
     email: Annotated[EmailStr | None, Form()] = None,
     username: Annotated[str | None, Form()] = None,
     display_name: Annotated[str | None, Form()] = None,
@@ -175,7 +175,7 @@ async def partial_update_user_me(
 @router.post("/change_password/", response_model=ConfirmSchema, responses=DEFAULT_RESPONSES)
 async def change_password_me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
-    user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
     passwords: ChangePasswordSchema,
 ) -> ConfirmSchema:
     """Смена пароля текущего пользователя."""
