@@ -141,6 +141,16 @@ class CompaniesSettings(BaseModel):
     company_deletion_timedelta: timedelta = timedelta(days=30)
 
 
+class WebSocketsSettings(BaseModel):
+    """Настройки подключения по websocket."""
+
+    # Максимальный размер сообщения которое может обработать websocket.
+    max_websocket_message_size: int = 1024 * 4  # 4 KB
+
+    # Интервал heartbeat в миллисекундах.
+    heart_beat_interval: int = 1000 * 60 * 60 * 24  # 1 день
+
+
 class Settings(BaseSettings):
     """Конфигурация бекенда."""
 
@@ -150,8 +160,7 @@ class Settings(BaseSettings):
     companies: CompaniesSettings = CompaniesSettings()
 
     # Настройки websocket.
-    # Максимальный размер сообщения которое может обработать websocket.
-    max_websocket_message_size: int = 1024 * 4  # 4 KB
+    websocket: WebSocketsSettings = WebSocketsSettings()
 
     # Настройки подключения к базе данных
     db: DataBaseSettings
