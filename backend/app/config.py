@@ -75,7 +75,7 @@ class RabbitMQSettings(BaseModel):
     password: str
 
     exchange_name_template: str = "company_{company_id}"
-    routing_key_template: str = "chanel_{channel_id}"
+    routing_key_template: str = "{type}_chanel_{channel_id}"
     queue_name_template: str = "user_{user_id}"
 
 
@@ -148,7 +148,10 @@ class WebSocketsSettings(BaseModel):
     max_websocket_message_size: int = 1024 * 4  # 4 KB
 
     # Интервал heartbeat в миллисекундах.
-    heart_beat_interval: int = 1000 * 60 * 60 * 24  # 1 день
+    heartbeat_interval: int = 1000 * 60 * 60 * 24  # 1 день
+
+    # Интервал в секундах по истечению которого связь считается разорванной.
+    timeout_interval: int = heartbeat_interval / 1000 * 3
 
 
 class Settings(BaseSettings):

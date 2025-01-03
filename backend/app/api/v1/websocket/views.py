@@ -1,4 +1,5 @@
 import asyncio
+from functools import partial
 from pprint import pprint
 from typing import Annotated
 from uuid import UUID, uuid4
@@ -7,19 +8,21 @@ import orjson
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.api.v1.dependencies.jwt import get_current_user_id
+
 from app.api.v1.websocket.functions import rabbitmq_message_handler
 from app.config import settings
+from app.constants import RabbitMQRoutingKeysTypes
 from app.logger import logger
 from app.rabbitmq import rabbitmq_client
 
 router = APIRouter(tags=["websocket"])
 
 company_id = UUID("e7682ea1-d0fd-44e1-9760-5d2f6b83e969")
-chanel_id = UUID("a56fef68-33cd-4173-917b-e74365a5cdb8")
+channel_id = UUID("a56fef68-33cd-4173-917b-e74365a5cdb8")
 
 
 @router.websocket("/chat/")
-async def chat_websocket(websocket: WebSocket, user_id: Annotated[UUID, get_current_user_id]) -> None:
+async def chat_websocket(websocket: WebSocket) -> None:
     """Метод для обслуживания вебсокет подключения к чату."""
     logger.debug("Новое подключение к websocket")
     await websocket.accept()
@@ -27,9 +30,15 @@ async def chat_websocket(websocket: WebSocket, user_id: Annotated[UUID, get_curr
 
     async def consume_queue() -> None:
         """Получение сообщения из RabbitMQ."""
-        await rabbitmq_client.consume(user_id, lambda message: rabbitmq_message_handler(message, websocket))
+        await rabbitmq_client.consume(user_id, partial(rabbitmq_message_handler, websocket=websocket))
 
-    await rabbitmq_client.update_channels_bindings(company_id, chanel_id, user_id, "add")
+    await rabbitmq_client.update_channels_bindings(
+        company_id=company_id,
+        channel_id=channel_id,
+        user_id=user_id,
+        type=RabbitMQRoutingKeysTypes.MESSAGES,
+        action="add",
+    )
 
     consume_queue_task = asyncio.create_task(consume_queue())
     try:
@@ -47,7 +56,12 @@ async def chat_websocket(websocket: WebSocket, user_id: Annotated[UUID, get_curr
                 break
 
             logger.debug(f"Получено сообщение от {user_id} message: {message}")
-            await rabbitmq_client.publish(company_id, chanel_id, message.encode("utf-8"))
+            await rabbitmq_client.publish(
+                company_id=company_id,
+                channel_id=channel_id,
+                type=RabbitMQRoutingKeysTypes.MESSAGES,
+                message=message.encode("utf-8"),
+            )
     except WebSocketDisconnect:
         logger.debug(f"Клиент {user_id} отключился")
     finally:

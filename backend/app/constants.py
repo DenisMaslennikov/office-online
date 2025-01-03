@@ -55,3 +55,12 @@ class FileTypes(enum.Enum):
     """Enum хранилище типов файлов."""
 
     USER_IMAGE: str = "USER_IMAGE"
+
+
+@enum.unique
+class RabbitMQRoutingKeysTypes(enum.Enum):
+    """Типы ключей маршрутизации для RabbitMQ."""
+
+    TYPING: str = "TYPING"
+    MESSAGES: str = "MESSAGES"
+    MESSAGES_BODY: str = "MESSAGES_BODY"

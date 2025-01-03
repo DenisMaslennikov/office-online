@@ -5,6 +5,7 @@ import aio_pika
 from aio_pika.abc import AbstractExchange, AbstractQueue
 
 from app.config import settings
+from app.constants import RabbitMQRoutingKeysTypes
 from app.logger import logger
 
 
@@ -53,33 +54,34 @@ class AIORabbiMQClient:
         )
         return self.exchanges[exchange_name]
 
-    async def publish(self, company_id: UUID, channel_id: UUID, message: bytes) -> None:
+    async def publish(self, company_id: UUID, channel_id: UUID, type: RabbitMQRoutingKeysTypes, message: bytes) -> None:
         """Публикует сообщение в обменник."""
         exchange_name = settings.rabbitmq.exchange_name_template.format(company_id=company_id)
-        routing_key = settings.rabbitmq.routing_key_template.format(channel_id=channel_id)
+        routing_key = settings.rabbitmq.routing_key_template.format(type=type.value, channel_id=channel_id)
         try:
             exchange = self.exchanges.get(exchange_name)
             if exchange is None:
                 exchange = await self._declare_exchange(exchange_name, aio_pika.ExchangeType.TOPIC, auto_delete=True)
-            logger.debug(f"Публикую сообщение в {exchange_name}: {message}")
+            logger.debug(f"Публикую сообщение в {exchange_name}:{routing_key} {message}")
             await exchange.publish(aio_pika.Message(message), routing_key=routing_key)
         except aio_pika.exceptions.ChannelClosed:
             logger.debug("Обменник был удален. Создаю новый обменник.")
             exchange = await self._declare_exchange(exchange_name, aio_pika.ExchangeType.TOPIC, auto_delete=True)
             await exchange.publish(aio_pika.Message(message), routing_key=routing_key)
 
-    async def update_channels_bindings(self, company_id: UUID, channel_id: UUID, user_id: UUID, action: str) -> None:
+    async def update_channels_bindings(
+        self, company_id: UUID, channel_id: UUID, type: RabbitMQRoutingKeysTypes, user_id: UUID, action: str
+    ) -> None:
         """Обновляет подписки пользователя на канал."""
         exchange_name = settings.rabbitmq.exchange_name_template.format(company_id=company_id)
-        routing_key = settings.rabbitmq.routing_key_template.format(channel_id=channel_id)
+        routing_key = settings.rabbitmq.routing_key_template.format(type=type.value, channel_id=channel_id)
 
         exchange = await self._declare_exchange(exchange_name, aio_pika.ExchangeType.TOPIC, auto_delete=True)
 
         queue = await self.declare_queue(user_id)
 
         logger.debug(
-            f"Обновляю слушателя канала {channel_id} в компании {company_id} для пользователя {user_id} действие "
-            f"{action}"
+            f"Обновляю слушателя {routing_key} в компании {company_id} для пользователя {user_id} действие {action}"
         )
 
         if action.lower() == "add":
@@ -107,9 +109,9 @@ class AIORabbiMQClient:
         """Получение сообщения из очереди."""
         queue = await self.declare_queue(user_id)
         async for message in queue:
-            logger.debug("Получено сообщение из очереди")
+            logger.debug(f"Получено сообщение из очереди {queue.name}")
             async with message.process():
-                await callback(message.body.decode())
+                await callback(message.body.decode("utf-8"))
 
     async def close(self):
         """Закрытие подключения."""
