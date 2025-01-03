@@ -1,6 +1,6 @@
 from starlette.websockets import WebSocket
 
-from app import logger
+from app.logger import logger
 
 
 async def rabbitmq_message_handler(message: str, websocket: WebSocket):
