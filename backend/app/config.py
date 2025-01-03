@@ -74,9 +74,9 @@ class RabbitMQSettings(BaseModel):
     user: str
     password: str
 
-    exchange_name_template: str = "company_{company_id}"
-    routing_key_template: str = "{type}_chanel_{channel_id}"
-    queue_name_template: str = "user_{user_id}"
+    exchange_name_template: str = "company.{company_id}"
+    routing_key_template: str = "{type}.chanel.{channel_id}"
+    queue_name_template: str = "user.{user_id}"
 
 
 class LoggerSettings(BaseModel):
