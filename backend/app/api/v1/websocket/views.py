@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 
 import orjson
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.params import Query
 
 from app.api.v1.dependencies.jwt import get_current_user_id
 
@@ -22,10 +23,11 @@ channel_id = UUID("a56fef68-33cd-4173-917b-e74365a5cdb8")
 
 
 @router.websocket("/chat/")
-async def chat_websocket(websocket: WebSocket) -> None:
+async def chat_websocket(websocket: WebSocket, token: Annotated[str, Query(title="access JWT токен")]) -> None:
     """Метод для обслуживания вебсокет подключения к чату."""
     logger.debug("Новое подключение к websocket")
     await websocket.accept()
+    # TODO Убрать при подключении базы
     user_id = uuid4()
 
     async def consume_queue() -> None:
@@ -49,7 +51,6 @@ async def chat_websocket(websocket: WebSocket) -> None:
                 break
             try:
                 message_json = orjson.loads(message)
-                pprint(message_json)
             except orjson.JSONDecodeError as e:
                 logger.error(f"Ошибка декодирования json для сообщения {message}", exc_info=e)
                 await websocket.close(code=1003, reason="Полученное сообщение не является json")
