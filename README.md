@@ -17,7 +17,7 @@
 1) [Структура БД](https://dbdiagram.io/d/online_office-674309ede9daa85aca83d70e)
 2) Возможность регистрации пользователей и аутентификации
 3) Механизм получения/обновления JWT токена
-4) Тестовый websocket чата с возможностью отправки сообщения и рассылки всем подписанным на канал клиентам. [Проект протокола websocket](https://docs.google.com/document/d/138YtcPSjwvNBRKij6UjerFuiyjv6x1ZWpNOoYhxnI8s/edit?usp=sharing)
+4) Тестовый websocket чат с возможностью отправки сообщения и рассылки всем подписанным на канал клиентам. [Проект протокола websocket](https://docs.google.com/document/d/138YtcPSjwvNBRKij6UjerFuiyjv6x1ZWpNOoYhxnI8s/edit?usp=sharing)
 
 ## Запуск dev сервера:
 1) Клонируйте репозиторий `git clone https://github.com/DenisMaslennikov/office-online.git`
