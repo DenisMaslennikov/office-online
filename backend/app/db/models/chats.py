@@ -48,7 +48,7 @@ class Channel(Base, UUIDPrimaryKeyMixin):
 
     name: Mapped[str | None] = mapped_column(String(30), comment="Название канала")
     description: Mapped[str] = mapped_column(comment="Описание канала")
-    channel_group_id: Mapped[uuid.UUID] = mapped_column(
+    channel_group_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("channels_groups.id", ondelete="CASCADE"), comment="Идентификатор группы каналов"
     )
     permissions_parent_channel_group_id: Mapped[uuid.UUID] = mapped_column(
@@ -61,6 +61,9 @@ class Channel(Base, UUIDPrimaryKeyMixin):
     order: Mapped[int] = mapped_column(SMALLINT, comment="Порядок при сортировке")
     system: Mapped[bool] = mapped_column(comment="Системный канал")
     private: Mapped[bool] = mapped_column(comment="Приватный чат")
+    project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
+    )
 
     def __repr__(self):
         return f"<Channel {self.name}>"
