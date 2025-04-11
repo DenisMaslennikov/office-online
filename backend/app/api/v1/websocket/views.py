@@ -1,14 +1,11 @@
 import asyncio
 from functools import partial
-from pprint import pprint
 from typing import Annotated
 from uuid import UUID, uuid4
 
 import orjson
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.params import Query
-
-from app.api.v1.dependencies.jwt import get_current_user_id
 
 from app.api.v1.websocket.functions import rabbitmq_message_handler
 from app.config import settings

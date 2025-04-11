@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, ForeignKey, String, UniqueConstraint, func, text
+from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, CheckConstraint, ForeignKey, String, UniqueConstraint, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.constants import DELETED_MESSAGE_ID, DELETED_USER_ID
@@ -32,6 +32,9 @@ class ChannelsGroup(Base, UUIDPrimaryKeyMixin):
     )
     system: Mapped[bool] = mapped_column(comment="Является системной")
     order: Mapped[int] = mapped_column(SMALLINT, comment="Порядок при сортировке")
+    project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
+    )
 
     def __repr__(self):
         return f"<ChannelsGroup {self.name}>"
@@ -43,6 +46,14 @@ class Channel(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "channels"
     __table_args__ = (
         UniqueConstraint("name", "company_id", name="uq_channel_name"),
+        CheckConstraint(
+            '''
+            (channel_group_id IS NOT NULL AND project_id IS NULL)
+            OR
+            (channel_group_id IS NULL AND project_id IS NOT NULL)
+            ''',
+            name="check_channel_group_project_xor",
+        ),
         {"comment": "Каналы"},
     )
 
