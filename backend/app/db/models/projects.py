@@ -34,7 +34,7 @@ class Project(Base, UUIDPrimaryKeyMixin):
         default=DEFAULT_PROJECT_ICON_ID,
     )
 
-    chanel_groups: Mapped["ChannelsGroup"] = relationship(back_populates="project")
+    channels_groups: Mapped["ChannelsGroup"] = relationship(back_populates="project")
     boards: Mapped["Board"] = relationship(back_populates="project")
 
     def __repr__(self):
