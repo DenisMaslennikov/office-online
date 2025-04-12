@@ -9,9 +9,10 @@ from app.db.models.base import Base
 from app.db.models.mixins import UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from app.db.models import Icon
-    from app.db.models.chats import ChannelsGroup
     from app.db.models.boards import Board
+    from app.db.models.chats import ChannelsGroup
+    from app.db.models.classifiers import Icon
+    from app.db.models.companies import Company
 
 
 class Project(Base, UUIDPrimaryKeyMixin):
@@ -38,6 +39,7 @@ class Project(Base, UUIDPrimaryKeyMixin):
     channels_groups: Mapped[list["ChannelsGroup"]] = relationship(back_populates="project")
     boards: Mapped[list["Board"]] = relationship(back_populates="project")
     icon: Mapped["Icon"] = relationship()
+    company: Mapped["Company"] = relationship()
 
     def __repr__(self):
         return f"<Project {self.name}>"

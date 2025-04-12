@@ -53,11 +53,11 @@ class Channel(Base, UUIDPrimaryKeyMixin):
     __table_args__ = (
         UniqueConstraint("name", "company_id", name="uq_channel_name"),
         CheckConstraint(
-            """
+            '''
             (channel_group_id IS NOT NULL AND project_id IS NULL)
             OR
             (channel_group_id IS NULL AND project_id IS NOT NULL)
-            """,
+            ''',
             name="check_channel_group_project_xor",
         ),
         {"comment": "Каналы"},
