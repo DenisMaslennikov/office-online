@@ -1,11 +1,16 @@
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import BIGINT, ForeignKey, String, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.constants import DEFAULT_PROJECT_ICON_ID
 from app.db.models.base import Base
 from app.db.models.mixins import UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.db.models.chats import ChannelsGroup
+    from app.db.models.boards import Board
 
 
 class Project(Base, UUIDPrimaryKeyMixin):
@@ -28,6 +33,9 @@ class Project(Base, UUIDPrimaryKeyMixin):
         comment="Иконка проекта",
         default=DEFAULT_PROJECT_ICON_ID,
     )
+
+    chanel_groups: Mapped["ChannelsGroup"] = relationship(back_populates="project")
+    boards: Mapped["Board"] = relationship(back_populates="project")
 
     def __repr__(self):
         return f"<Project {self.name}>"

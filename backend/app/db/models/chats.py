@@ -1,12 +1,16 @@
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import BIGINT, SMALLINT, TIMESTAMP, CheckConstraint, ForeignKey, String, UniqueConstraint, func, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.constants import DELETED_MESSAGE_ID, DELETED_USER_ID
 from app.db.models.base import Base
 from app.db.models.mixins import BigIntPrimaryKeyMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.db.models import Project
 
 
 class ChannelsGroup(Base, UUIDPrimaryKeyMixin):
@@ -36,6 +40,8 @@ class ChannelsGroup(Base, UUIDPrimaryKeyMixin):
         ForeignKey("projects.id", ondelete="CASCADE"), comment="Идентификатор проекта"
     )
 
+    project: Mapped["Project"] = relationship(back_populates="channels_groups")
+
     def __repr__(self):
         return f"<ChannelsGroup {self.name}>"
 
@@ -47,11 +53,11 @@ class Channel(Base, UUIDPrimaryKeyMixin):
     __table_args__ = (
         UniqueConstraint("name", "company_id", name="uq_channel_name"),
         CheckConstraint(
-            '''
+            """
             (channel_group_id IS NOT NULL AND project_id IS NULL)
             OR
             (channel_group_id IS NULL AND project_id IS NOT NULL)
-            ''',
+            """,
             name="check_channel_group_project_xor",
         ),
         {"comment": "Каналы"},

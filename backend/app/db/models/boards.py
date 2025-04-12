@@ -1,11 +1,15 @@
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import SMALLINT, TIMESTAMP, CheckConstraint, ForeignKey, String, UniqueConstraint, func, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.models.base import Base
 from app.db.models.mixins import UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.db.models import Project
 
 
 class Board(Base, UUIDPrimaryKeyMixin):
@@ -26,6 +30,8 @@ class Board(Base, UUIDPrimaryKeyMixin):
     created_at: Mapped[datetime.datetime] = mapped_column(
         TIMESTAMP(timezone=True), comment="Дата создания", server_default=func.now()
     )
+
+    project: Mapped["Project"] = relationship(back_populates="boards")
 
     def __repr__(self):
         return f"<Board {self.name}>"
