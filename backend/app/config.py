@@ -11,6 +11,7 @@ class ApiV1Endpoints(BaseModel):
     """Эндпоинты первой версии апи."""
 
     users: str = "/users"
+    ui: str = "/ui"
     websocket: str = "/ws"
 
 
@@ -123,6 +124,7 @@ class FilesUrlsSettings(BaseModel):
 
     media: str
     users_images_url: str
+    icons_url: str
 
 
 class UsersSettings(BaseModel):
