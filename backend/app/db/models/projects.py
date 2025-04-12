@@ -39,7 +39,7 @@ class Project(Base, UUIDPrimaryKeyMixin):
     channels_groups: Mapped[list["ChannelsGroup"]] = relationship(back_populates="project")
     boards: Mapped[list["Board"]] = relationship(back_populates="project")
     icon: Mapped["Icon"] = relationship()
-    company: Mapped["Company"] = relationship()
+    company: Mapped["Company"] = relationship(back_populates="projects")
 
     def __repr__(self):
         return f"<Project {self.name}>"
